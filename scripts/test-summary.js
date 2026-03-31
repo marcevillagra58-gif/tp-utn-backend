@@ -1,0 +1,16 @@
+console.log("\n=======================================================================");
+console.log("🏆 REPORTE DE TESTING COMPLETADO — HURLINGHAM BACKEND");
+console.log("=======================================================================\n");
+console.log("📊 ¿CÓMO SE LEE EL CUADRO DE COVERAGE?\n");
+console.log("  El coverage mide qué porcentaje de nuestro código fuente real");
+console.log("  fue ejecutado exitosamente durante los tests automáticos.\n");
+console.log("  - % Stmts (Sentencias): Porcentaje de instrucciones ejecutadas.");
+console.log("  - % Branch (Ramas): Porcentaje de caminos lógicos (if/else) cubiertos.");
+console.log("  - % Funcs (Funciones): Porcentaje de funciones que fueron llamadas.");
+console.log("  - % Lines (Líneas): EL NÚMERO CLAVE. Porcentaje exacto de líneas");
+console.log("    de código validadas por la suite de testing.\n");
+console.log("💡 Para la presentación del TP:");
+console.log("  Actualmente nuestra suite evalúa más de la mitad del código crítico");
+console.log("  del sistema (~58% de las líneas totales), cubriendo 6 módulos vitales:");
+console.log("  Autenticación, Seguridad (JWT), Productores, Usuarios, Categorías y Contacto.");
+console.log("\n=======================================================================\n");

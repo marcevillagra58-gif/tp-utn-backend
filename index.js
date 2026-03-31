@@ -1,0 +1,183 @@
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import dotenv from "dotenv";
+import http from "http";
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import bodyParser from "body-parser";
+import jwt from "jsonwebtoken";
+import { Server as SocketServer } from "socket.io";
+
+import { connectMongoDB } from "./src/db/mongo.js";
+import { typeDefs } from "./src/graphql/typeDefs.js";
+import { resolvers } from "./src/graphql/resolvers.js";
+
+// Rutas
+import authRoutes from "./src/routes/auth.routes.js";
+import userRoutes from "./src/routes/users.routes.js";
+import producerRoutes from "./src/routes/producers.routes.js";
+import uploadRoutes from "./src/routes/upload.routes.js";
+import contactRoutes from "./src/routes/contact.routes.js";
+import externalRoutes from "./src/routes/external.routes.js";
+import notificationRoutes from "./src/routes/notifications.routes.js";
+import categoriaRoutes from "./src/routes/categories.routes.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerDocs from "./src/config/swagger.js";
+import { apiLimiter } from "./src/middleware/rateLimit.middleware.js";
+
+dotenv.config();
+
+const app = express();
+const httpServer = http.createServer(app);
+const PORT = process.env.PORT || 3000;
+
+// ============================================================
+// SOCKET.IO SETUP
+// ============================================================
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "http://localhost:5173",
+  "http://localhost:4173", // Vite preview
+  "https://marcelo-ag.github.io", // Ejemplo de URL de GitHub Pages
+].filter(Boolean);
+
+// Socket.io requiere conexiones persistentes (WebSocket).
+// En entornos serverless (Vercel) esto no es compatible.
+// El bloque try/catch garantiza que si falla, el resto del servidor funciona igual.
+let io;
+try {
+  io = new SocketServer(httpServer, {
+    cors: {
+      origin: allowedOrigins,
+      credentials: true,
+    },
+  });
+
+  io.on("connection", (socket) => {
+    console.log("📡 Nuevo cliente conectado:", socket.id);
+    socket.on("disconnect", () => {
+      console.log("🔌 Cliente desconectado:", socket.id);
+    });
+  });
+
+  console.log("✅ Socket.io inicializado");
+} catch (err) {
+  console.warn("⚠️  Socket.io no disponible en este entorno (serverless):", err.message);
+  // Stub vacío para que io.emit() no rompa el resto del código
+  io = { emit: () => {}, on: () => {} };
+}
+
+export { io };
+
+// ============================================================
+// APOLLO SERVER SETUP
+// ============================================================
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+});
+
+// ============================================================
+// MIDDLEWARE GLOBAL Y DE SEGURIDAD
+// ============================================================
+
+app.use(helmet()); // Protege las cabeceras HTTP (XSS, Clickjacking, MIME sniffing, etc.)
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  }),
+);
+
+app.use(express.json());
+
+// Aplicar Rate Limiter a todas las rutas que empiecen por /api/
+app.use("/api/", apiLimiter);
+
+// ============================================================
+// RUTAS REST
+// ============================================================
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "OK",
+    message: "Servidor Hurlingham PNO corriendo (REST + GraphQL)",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/producers", producerRoutes);
+app.use("/api/upload", uploadRoutes);
+app.use("/api/contact", contactRoutes);
+app.use("/api/external", externalRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/categorias", categoriaRoutes);
+
+// ============================================================
+// SWAGGER DOCS
+// ============================================================
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+// ============================================================
+// INICIO DEL SERVIDOR (REST + GRAPHQL)
+// ============================================================
+
+const startServer = async () => {
+  try {
+    // 1. Conectar a MongoDB
+    await connectMongoDB();
+    console.log("✅ MongoDB conectado");
+
+    // 2. Iniciar Apollo Server
+    await server.start();
+
+    // 3. Montar middleware de Apollo en /graphql
+    app.use(
+      "/graphql",
+      cors(),
+      bodyParser.json(),
+      expressMiddleware(server, {
+        context: async ({ req }) => {
+          const authHeader = req.headers.authorization || "";
+          if (authHeader.startsWith("Bearer ")) {
+            const token = authHeader.split(" ")[1];
+            try {
+              const decoded = jwt.verify(token, process.env.JWT_SECRET);
+              return { user: decoded };
+            } catch (err) {
+              return { user: null };
+            }
+          }
+          return { user: null };
+        },
+      }),
+    );
+
+    // 4. Ruta 404 (solo para lo que no atraparon REST o GraphQL)
+    app.use((req, res) => {
+      res.status(404).json({ error: "Ruta no encontrada" });
+    });
+
+    // 5. Iniciar servidor HTTP
+    httpServer.listen(PORT, () => {
+      console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+      console.log(`📊 GraphQL endpoint: http://localhost:${PORT}/graphql`);
+      console.log(`📋 Health check: http://localhost:${PORT}/api/health`);
+    });
+  } catch (error) {
+    console.error("❌ Error al iniciar el servidor:", error);
+    process.exit(1);
+  }
+};
+
+if (process.env.NODE_ENV !== "test") {
+  startServer();
+}
+
+export default app;
