@@ -24,12 +24,12 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
-        description: "Servidor Local de Desarrollo",
+        url: "https://tp-utn-backend.vercel.app",
+        description: "Servidor Vercel de Producción",
       },
       {
-        url: "https://tp-utn-backend.vercel.app", 
-        description: "Servidor Vercel de Producción",
+        url: "http://localhost:3000",
+        description: "Servidor Local de Desarrollo",
       }
     ],
     components: {
