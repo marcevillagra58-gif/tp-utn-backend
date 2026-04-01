@@ -147,7 +147,8 @@ app.get("/api-docs.json", (req, res) => {
 
 // Sirve la UI de Swagger usando assets de CDN (unpkg)
 app.get("/api-docs", (req, res) => {
-  const specUrl = `${req.protocol}://${req.get("host")}/api-docs.json`;
+  // URL relativa: el navegador hereda el protocolo (https) automáticamente
+  const specUrl = "/api-docs.json";
   res.setHeader("Content-Type", "text/html");
   res.send(`<!DOCTYPE html>
 <html lang="es">
