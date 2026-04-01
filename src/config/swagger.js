@@ -1,5 +1,16 @@
 import swaggerJsDoc from "swagger-jsdoc";
 
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Rutas donde swagger va a ir a leer los comentarios @swagger
+// Usamos path absoluto porque Vercel rompe las rutas relativas en la compilación
+const routesPath = path.join(__dirname, "../routes/*.js");
+const docsPath = path.join(__dirname, "../docs/*.js");
+
 const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
@@ -17,8 +28,8 @@ const swaggerOptions = {
         description: "Servidor Local de Desarrollo",
       },
       {
-        url: "https://tp-utn-backend.fly.dev", // Ejemplo si se sube a fly.io
-        description: "Servidor de Producción",
+        url: "https://tp-utn-backend.vercel.app", 
+        description: "Servidor Vercel de Producción",
       }
     ],
     components: {
@@ -31,8 +42,7 @@ const swaggerOptions = {
       },
     },
   },
-  // Rutas donde swagger va a ir a leer los comentarios @swagger
-  apis: ["./src/routes/*.js", "./src/docs/*.js"],
+  apis: [routesPath, docsPath],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
