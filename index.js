@@ -178,6 +178,8 @@ app.get("/api-docs", (req, res) => {
         layout: "StandaloneLayout",
         deepLinking: true,
         displayRequestDuration: true,
+        defaultModelsExpandDepth: 1,
+        defaultModelExpandDepth: 3,
       });
     };
   </script>
