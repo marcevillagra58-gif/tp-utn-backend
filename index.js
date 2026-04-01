@@ -84,7 +84,21 @@ const server = new ApolloServer({
 // MIDDLEWARE GLOBAL Y DE SEGURIDAD
 // ============================================================
 
-app.use(helmet()); // Protege las cabeceras HTTP (XSS, Clickjacking, MIME sniffing, etc.)
+// helmet() por defecto bloquea scripts externos (unpkg) y scripts inline.
+// Configuramos Content-Security-Policy para permitir que Swagger UI levante desde el CDN.
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+        imgSrc: ["'self'", "data:", "https://unpkg.com", "https://res.cloudinary.com"],
+        connectSrc: ["'self'", "https://unpkg.com"],
+      },
+    },
+  })
+);
 
 app.use(
   cors({
