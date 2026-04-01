@@ -239,7 +239,9 @@ const startServer = async () => {
   }
 };
 
-if (process.env.NODE_ENV !== "test") {
+// En Vercel (serverless), la inicialización la maneja api/index.js.
+// Solo arrancamos el servidor "clásico" cuando corremos localmente.
+if (process.env.NODE_ENV !== "test" && !process.env.VERCEL) {
   startServer();
 }
 
