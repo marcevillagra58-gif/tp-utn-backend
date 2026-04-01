@@ -93,7 +93,7 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
         styleSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
-        imgSrc: ["'self'", "data:", "https://unpkg.com", "https://res.cloudinary.com"],
+        imgSrc: ["'self'", "data:", "https://unpkg.com", "https://res.cloudinary.com", "https://validator.swagger.io"],
         connectSrc: ["'self'", "https://unpkg.com"],
       },
     },
