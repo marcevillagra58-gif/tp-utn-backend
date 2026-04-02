@@ -160,7 +160,32 @@ router.post("/", authMiddleware, adminMiddleware, createUserValidation, createUs
 // PUT /api/users/:id → admin o propio
 router.put("/:id", authMiddleware, updateUserValidation, updateUser);
 
-// DELETE /api/users/:id → solo admin
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   delete:
+ *     summary: Eliminar usuario y productor asociado (Requiere rol Admin)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
+ *         description: El UUID del usuario en Supabase
+ *     responses:
+ *       200:
+ *         description: Usuario eliminado correctamente
+ *       400:
+ *         description: No podés eliminar tu propia cuenta de admin
+ *       403:
+ *         description: Acceso denegado (requiere Admin)
+ *       404:
+ *         description: Usuario no encontrado
+ */
 router.delete("/:id", authMiddleware, adminMiddleware, deleteUser);
 
 // PATCH /api/users/:id/block → solo admin
