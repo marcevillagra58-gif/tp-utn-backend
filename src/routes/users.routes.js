@@ -56,6 +56,14 @@ const createUserValidation = [
     .withMessage("Debe incluir al menos una mayúscula")
     .matches(/[0-9]/)
     .withMessage("Debe incluir al menos un número"),
+  body("role")
+    .isIn(["admin", "producer"])
+    .withMessage("El rol debe ser admin o producer"),
+  body("category")
+    .if(body("role").equals("producer"))
+    .notEmpty()
+    .withMessage("La categoría es obligatoria para los productores")
+    .trim(),
 ];
 
 const updateUserValidation = [
@@ -118,18 +126,34 @@ router.get("/:id", authMiddleware, getUserById);
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - username
+ *               - email
+ *               - password
+ *               - role
  *             properties:
  *               username:
  *                 type: string
+ *                 description: Nombre de usuario único
  *               email:
  *                 type: string
+ *                 format: email
  *               password:
  *                 type: string
+ *                 description: Mínimo 8 caracteres, 1 mayúscula y 1 número
+ *               role:
+ *                 type: string
+ *                 enum: [admin, producer]
+ *               category:
+ *                 type: string
+ *                 description: Obligatoria para productores (ej. alimentos, servicios)
  *     responses:
  *       201:
  *         description: Usuario creado exitosamente
  *       400:
- *         description: Error de validación (ej. constraseña débil)
+ *         description: Error de validación (ej. contraseña débil)
+ *       403:
+ *         description: Acceso denegado (requiere Admin)
  */
 router.post("/", authMiddleware, adminMiddleware, createUserValidation, createUser);
 
