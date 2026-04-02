@@ -129,14 +129,9 @@ const swaggerOptions = {
         AuthResponse: {
           type: "object",
           properties: {
+            accessToken: { type: "string", description: "JWT principal para mandar por headers Bearer" },
+            refreshToken: { type: "string", description: "Token para renovar la sesión sin volver a pedir usuario/clave" },
             user: { $ref: "#/components/schemas/User" },
-            session: {
-              type: "object",
-              properties: {
-                access_token: { type: "string", description: "JWT para enviar en headers Bearer" },
-                refresh_token: { type: "string" },
-              },
-            },
           },
         },
         ErrorResponse: {
