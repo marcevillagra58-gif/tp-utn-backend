@@ -100,7 +100,69 @@ router.put("/:id", authMiddleware, producerValidation, updateProducer);
 router.delete("/:id", authMiddleware, adminMiddleware, deleteProducer);
 
 // ─── Productos embebidos ─────────────────────
+/**
+ * @swagger
+ * /api/producers/{id}/products:
+ *   post:
+ *     summary: Agregar un producto al catálogo del productor (Requiere autenticación)
+ *     tags: [Producers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del Productor en MongoDB
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Nombre del producto
+ *               description:
+ *                 type: string
+ *               imageUrl:
+ *                 type: string
+ *                 description: URL de la imagen del producto
+ *     responses:
+ *       200:
+ *         description: Producto agregado exitosamente
+ */
 router.post("/:id/products", authMiddleware, productValidation, addProduct);
+
+/**
+ * @swagger
+ * /api/producers/{id}/products/{productId}:
+ *   delete:
+ *     summary: Eliminar un producto del productor (Requiere autenticación)
+ *     tags: [Producers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del Productor en MongoDB
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del Producto a eliminar
+ *     responses:
+ *       200:
+ *         description: Producto eliminado exitosamente
+ */
 router.delete("/:id/products/:productId", authMiddleware, deleteProduct);
 
 // ─── Comentarios ──────────────────────────────
