@@ -102,9 +102,7 @@ const swaggerOptions = {
             _id: { type: "string" },
             name: { type: "string" },
             description: { type: "string" },
-            price: { type: "number" },
             imageUrl: { type: "string" },
-            stock: { type: "integer" },
           },
         },
         Comment: {
