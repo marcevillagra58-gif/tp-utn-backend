@@ -20,16 +20,59 @@ import { authMiddleware } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
-// POST /api/upload/image
-// multipart/form-data con campo "image"
-// Se usa un wrapper para capturar errores de Multer (ej: File too large)
+/**
+ * @swagger
+ * tags:
+ *   name: Uploads
+ *   description: Subida y eliminación de imágenes a Cloudinary
+ */
+
+/**
+ * @swagger
+ * /api/upload/image:
+ *   post:
+ *     summary: Subir una imagen a Cloudinary (Requiere autenticación)
+ *     tags: [Uploads]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: folder
+ *         schema:
+ *           type: string
+ *         description: Carpeta destino en Cloudinary (ej. avatars, products). Opcional.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: Archivo de imagen a subir.
+ *     responses:
+ *       200:
+ *         description: Imagen subida correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 imageUrl:
+ *                   type: string
+ *                 publicId:
+ *                   type: string
+ *       400:
+ *         description: Archivo muy grande o error de validación
+ */
 router.post(
   "/image",
   authMiddleware,
   (req, res, next) => {
     uploadMiddleware.single("image")(req, res, (err) => {
       if (err) {
-        // Multer lanza errores antes de llegar al controller
         if (err.code === "LIMIT_FILE_SIZE") {
           return res
             .status(400)
@@ -46,8 +89,32 @@ router.post(
   uploadImageHandler,
 );
 
-// DELETE /api/upload/image
-// Body: { publicId: "..." }
+/**
+ * @swagger
+ * /api/upload/image:
+ *   delete:
+ *     summary: Eliminar una imagen de Cloudinary (Requiere autenticación)
+ *     tags: [Uploads]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - publicId
+ *             properties:
+ *               publicId:
+ *                 type: string
+ *                 description: ID público de la imagen devuelto por Cloudinary
+ *     responses:
+ *       200:
+ *         description: Imagen eliminada correctamente
+ *       400:
+ *         description: Faltan parámetros en la petición
+ */
 router.delete("/image", authMiddleware, deleteImageHandler);
 
 export default router;
