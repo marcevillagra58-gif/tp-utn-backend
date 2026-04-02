@@ -344,7 +344,7 @@ export const deleteProduct = async (req, res) => {
 // ─────────────────────────────────────────────
 export const addComment = async (req, res) => {
   try {
-    const { text, authorName, parentId } = req.body;
+    const { text, username, authorName, parentId } = req.body;
 
     if (!text || text.trim().length === 0) {
       return res
@@ -360,7 +360,7 @@ export const addComment = async (req, res) => {
     const newComment = {
       userId: req.user?.userId || null,
       username:
-        req.user?.username || req.user?.email || authorName || "Visitante",
+        req.user?.username || req.user?.email || username || authorName || "Visitante",
       text: text.trim(),
       parentId: parentId || null,
     };
