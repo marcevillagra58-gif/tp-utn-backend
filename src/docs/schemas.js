@@ -37,24 +37,19 @@
  *     Category:
  *       type: object
  *       required:
- *         - name
- *         - slug
+ *         - nombre
  *       properties:
  *         id:
  *           type: string
  *           format: uuid
- *         name:
+ *         nombre:
  *           type: string
- *         slug:
+ *         icono:
  *           type: string
- *         description:
+ *           description: Emoji o ícono representativo de la categoría
+ *         created_at:
  *           type: string
- *         type:
- *           type: string
- *           enum: [producto, servicio]
- *         custom_fields:
- *           type: object
- *           description: JSONB con campos dinámicos específicos de la categoría
+ *           format: date-time
  *     Producer:
  *       type: object
  *       required:

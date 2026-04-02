@@ -55,14 +55,12 @@ const swaggerOptions = {
         },
         Category: {
           type: "object",
-          required: ["name", "slug"],
+          required: ["nombre"],
           properties: {
             id: { type: "string", format: "uuid" },
-            name: { type: "string" },
-            slug: { type: "string" },
-            description: { type: "string" },
-            type: { type: "string", enum: ["producto", "servicio"] },
-            custom_fields: { type: "object", description: "JSONB con campos dinámicos específicos de la categoría" },
+            nombre: { type: "string" },
+            icono: { type: "string", description: "Emoji o ícono representativo de la categoría" },
+            created_at: { type: "string", format: "date-time" },
           },
         },
         Producer: {
