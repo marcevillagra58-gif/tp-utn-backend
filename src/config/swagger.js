@@ -47,7 +47,7 @@ const swaggerOptions = {
             id: { type: "string", format: "uuid", description: "ID único de Supabase" },
             username: { type: "string", description: "Nombre de usuario único" },
             email: { type: "string", format: "email", description: "Correo electrónico del usuario" },
-            role: { type: "string", enum: ["user", "admin", "producer"], description: "Rol del usuario en el sistema" },
+            role: { type: "string", enum: ["admin", "producer"], description: "Rol del usuario en el sistema" },
             avatar: { type: "string", format: "uri", description: "URL de la foto de perfil (Cloudinary)" },
             is_blocked: { type: "boolean", description: "Indica si el usuario fue bloqueado por un admin" },
             created_at: { type: "string", format: "date-time" },

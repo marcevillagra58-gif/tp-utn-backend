@@ -22,7 +22,7 @@
  *           description: Correo electrónico del usuario
  *         role:
  *           type: string
- *           enum: [user, admin, producer]
+ *           enum: [admin, producer]
  *           description: Rol del usuario en el sistema
  *         avatar:
  *           type: string

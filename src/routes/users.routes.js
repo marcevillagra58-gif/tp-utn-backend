@@ -108,10 +108,9 @@ router.get("/:id", authMiddleware, getUserById);
  * @swagger
  * /api/users:
  *   post:
- *     summary: Registrar nuevo usuario (Público o Admin)
+ *     summary: Crear nuevo usuario/productor (Requiere rol Admin)
  *     tags: [Users]
  *     security:
- *       - {}
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
@@ -132,7 +131,7 @@ router.get("/:id", authMiddleware, getUserById);
  *       400:
  *         description: Error de validación (ej. constraseña débil)
  */
-router.post("/", optionalAuthMiddleware, createUserValidation, createUser);
+router.post("/", authMiddleware, adminMiddleware, createUserValidation, createUser);
 
 // PUT /api/users/:id → admin o propio
 router.put("/:id", authMiddleware, updateUserValidation, updateUser);

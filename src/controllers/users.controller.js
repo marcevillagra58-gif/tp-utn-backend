@@ -110,8 +110,9 @@ export const createUser = async (req, res) => {
 
     const { username, name, email, password, role, avatar, category } = req.body;
 
-    // Solo admin puede asignar roles distintos de 'user'
-    const assignedRole = req.user?.role === "admin" && role ? role : "user";
+    // Como la ruta ya está protegida por adminMiddleware, sabemos que es Admin.
+    // Asignamos el rol solicitado, o "producer" por defecto.
+    const assignedRole = role === "admin" ? "admin" : "producer";
 
     // Hashear password con el esquema dual
     const hashedPassword = await hashPassword(password, username);
