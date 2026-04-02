@@ -225,6 +225,27 @@ export const deleteProducer = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────
+// GET /api/producers/:id/products  (público)
+// ─────────────────────────────────────────────
+export const getProducts = async (req, res) => {
+  try {
+    const producer = await Producer.findById(req.params.id);
+
+    if (!producer) {
+      return res.status(404).json({ error: "Productor no encontrado" });
+    }
+
+    res.json(producer.products);
+  } catch (err) {
+    if (err.name === "CastError") {
+      return res.status(404).json({ error: "Productor no encontrado" });
+    }
+    console.error("Error en getProducts:", err);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+// ─────────────────────────────────────────────
 // POST /api/producers/:id/products  (admin)
 // ─────────────────────────────────────────────
 export const addProduct = async (req, res) => {

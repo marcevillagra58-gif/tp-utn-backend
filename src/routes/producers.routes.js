@@ -29,6 +29,7 @@ import {
   createProducer,
   updateProducer,
   deleteProducer,
+  getProducts,
   addProduct,
   deleteProduct,
   addComment,
@@ -100,6 +101,27 @@ router.put("/:id", authMiddleware, producerValidation, updateProducer);
 router.delete("/:id", authMiddleware, adminMiddleware, deleteProducer);
 
 // ─── Productos embebidos ─────────────────────
+/**
+ * @swagger
+ * /api/producers/{id}/products:
+ *   get:
+ *     summary: Obtener el catálogo de productos de un productor
+ *     tags: [Producers]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del Productor en MongoDB
+ *     responses:
+ *       200:
+ *         description: Lista de productos asociados al productor
+ *       404:
+ *         description: Productor no encontrado
+ */
+router.get("/:id/products", getProducts);
+
 /**
  * @swagger
  * /api/producers/{id}/products:
