@@ -59,7 +59,7 @@ Por encima, la gestión de Tokens no descansa únicamente en la solución preemp
 
 ## 4. Instrucciones Técnicas de Levantamiento
 
-Para montar esta estructura localmente u auditar la aplicación:
+Para montar esta estructura localmente o auditar la aplicación:
 
 1. **Instalación de Dependencias**
    ```bash
@@ -69,13 +69,21 @@ Para montar esta estructura localmente u auditar la aplicación:
 2. **Entorno `.env`**
    Se debe garantizar que las cadenas de conexión (URI) hacia *MongoDB* y *Supabase* están activas, junto a sus secretos criptográficos estáticos (`JWT_SECRET`).
 
-3. **Ejecución y Testeo Ágil**
+3. **Ejecución y Modos de Testeo (TDD)**
+   Para auditar el código se incluye la suite de testing automatizada desarrollada con **Jest** y **Supertest**:
    ```bash
+   # Ejecutar los tests unitarios y de integración
+   npm test
+
+   # Levantar el servidor en entorno local para uso manual
    npm run dev
    ```
 
-4. **Acceder al Dashboard Interactivo**
-   Navegar al entorno `http://localhost:<PUERTO>/api-docs` para interactuar físicamente sin necesidad de software terciario.
+4. **Acceder a Swagger UI (Despliegue Local o Remoto)**
+   Una vez levantado el servidor, la documentación interactiva Swagger reemplaza la necesidad de usar Postman. 
+   Para hacer pruebas manuales directas, simplemente abrí un navegador y entrá a la ruta `/api-docs`:
+   - URL Local: `http://localhost:3000/api-docs`
+   - URL Remota (Vercel): `https://<tu-url-de-vercel>.vercel.app/api-docs`
 
 ---
 *Fin Documento Versión V1.0*
