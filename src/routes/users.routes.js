@@ -152,8 +152,16 @@ router.get("/:id", authMiddleware, getUserById);
  *         description: Usuario creado exitosamente
  *       400:
  *         description: Error de validación (ej. contraseña débil)
+ *       401:
+ *         description: Usuario no autenticado
  *       403:
  *         description: Acceso denegado (requiere Admin)
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post("/", authMiddleware, adminMiddleware, createUserValidation, createUser);
 
@@ -181,10 +189,18 @@ router.put("/:id", authMiddleware, updateUserValidation, updateUser);
  *         description: Usuario eliminado correctamente
  *       400:
  *         description: No podés eliminar tu propia cuenta de admin
+ *       401:
+ *         description: Usuario no autenticado
  *       403:
  *         description: Acceso denegado (requiere Admin)
  *       404:
  *         description: Usuario no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.delete("/:id", authMiddleware, adminMiddleware, deleteUser);
 

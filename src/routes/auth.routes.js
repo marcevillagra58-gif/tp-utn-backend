@@ -49,8 +49,20 @@ const loginValidation = [
  *     responses:
  *       200:
  *         description: JWT Token e información del usuario devueltos exitosamente.
+ *       400:
+ *         description: Faltan credenciales
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       401:
  *         description: Credenciales inválidas.
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post("/login", loginRateLimiter, loginValidation, login);
 
@@ -64,8 +76,18 @@ router.post("/login", loginRateLimiter, loginValidation, login);
  *     responses:
  *       200:
  *         description: Nuevo accesToken generado
+ *       400:
+ *         description: Refresh token no provisto
+ *       401:
+ *         description: Token inválido
  *       403:
  *         description: Refresh token inválido o expirado
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post("/refresh", refreshToken);
 
@@ -89,6 +111,14 @@ router.post("/refresh", refreshToken);
  *     responses:
  *       200:
  *         description: Logout exitoso
+ *       400:
+ *         description: Faltan parámetros en la petición
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post("/logout", logout);
 
@@ -116,6 +146,12 @@ router.post("/logout", logout);
  *         description: Si el email existe, se envía el link (siempre 200 para no revelar información).
  *       400:
  *         description: Email no informado.
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post("/forgot-password", forgotPassword);
 
@@ -146,6 +182,12 @@ router.post("/forgot-password", forgotPassword);
  *         description: Contraseña actualizada correctamente.
  *       400:
  *         description: Token inválido, expirado o contraseña muy corta.
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post("/reset-password", resetPassword);
 

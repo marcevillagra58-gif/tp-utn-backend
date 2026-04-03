@@ -119,6 +119,12 @@ router.delete("/:id", authMiddleware, adminMiddleware, deleteProducer);
  *         description: Lista de productos asociados al productor
  *       404:
  *         description: Productor no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get("/:id/products", getProducts);
 
@@ -155,8 +161,22 @@ router.get("/:id/products", getProducts);
  *                 type: string
  *                 description: URL de la imagen del producto
  *     responses:
- *       200:
+ *       201:
  *         description: Producto agregado exitosamente
+ *       400:
+ *         description: Error de validación en los datos enviados
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         description: Usuario no autenticado
+ *       403:
+ *         description: No tenés permiso para agregar productos a este productor
+ *       404:
+ *         description: Productor no encontrado
+ *       500:
+ *         description: Error interno del servidor
  */
 router.post("/:id/products", authMiddleware, productValidation, addProduct);
 
@@ -184,6 +204,18 @@ router.post("/:id/products", authMiddleware, productValidation, addProduct);
  *     responses:
  *       200:
  *         description: Producto eliminado exitosamente
+ *       401:
+ *         description: Usuario no autenticado
+ *       403:
+ *         description: No tenés permiso para eliminar productos de este productor
+ *       404:
+ *         description: Productor no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.delete("/:id/products/:productId", authMiddleware, deleteProduct);
 
@@ -218,10 +250,57 @@ router.delete("/:id/products/:productId", authMiddleware, deleteProduct);
  *                 type: string
  *                 description: El comentario
  *     responses:
- *       200:
+ *       201:
  *         description: Comentario agregado.
+ *       400:
+ *         description: El comentario no puede estar vacío o supera los 500 caracteres
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Productor no encontrado
+ *       500:
+ *         description: Error interno del servidor
  */
 router.post("/:id/comments", optionalAuthMiddleware, addComment);
+/**
+ * @swagger
+ * /api/producers/{id}/comments/{commentId}:
+ *   delete:
+ *     summary: Eliminar un comentario (Requiere ser el autor o Admin)
+ *     tags: [Producers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del Productor
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del Comentario
+ *     responses:
+ *       200:
+ *         description: Comentario eliminado correctamente
+ *       401:
+ *         description: Usuario no autenticado
+ *       403:
+ *         description: No tenés permiso para eliminar este comentario
+ *       404:
+ *         description: Comentario no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.delete("/:id/comments/:commentId", authMiddleware, deleteComment);
 
 export default router;

@@ -39,6 +39,12 @@ const router = Router();
  *     responses:
  *       200:
  *         description: Arreglo JSON con las categorías disponibles.
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get("/", getCategorias);
 
@@ -68,10 +74,20 @@ router.get("/", getCategorias);
  *     responses:
  *       201:
  *         description: Categoría creada con éxito
+ *       400:
+ *         description: El nombre de la categoría es requerido
+ *       401:
+ *         description: Credenciales inválidas o no enviadas
  *       403:
  *         description: Requiere permisos de administrador
  *       409:
  *         description: Ya existe una categoría con ese nombre
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post("/",    authMiddleware, adminMiddleware, createCategoria);
 
@@ -104,10 +120,22 @@ router.post("/",    authMiddleware, adminMiddleware, createCategoria);
  *     responses:
  *       200:
  *         description: Categoría actualizada
+ *       400:
+ *         description: Nada que actualizar
+ *       401:
+ *         description: Credenciales inválidas o no enviadas
  *       403:
  *         description: Requiere permisos de administrador
+ *       404:
+ *         description: Categoría no encontrada
  *       409:
  *         description: Ya existe una categoría con ese nombre
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.put("/:id",  authMiddleware, adminMiddleware, updateCategoria);
 
@@ -129,8 +157,20 @@ router.put("/:id",  authMiddleware, adminMiddleware, updateCategoria);
  *     responses:
  *       200:
  *         description: Categoría eliminada
+ *       401:
+ *         description: Credenciales inválidas o no enviadas
  *       403:
  *         description: Requiere permisos de administrador
+ *       404:
+ *         description: Categoría no encontrada
+ *       409:
+ *         description: No se puede eliminar (en uso)
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.delete("/:id", authMiddleware, adminMiddleware, deleteCategoria);
 
