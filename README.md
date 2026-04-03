@@ -44,6 +44,10 @@ Uso de un entorno Polyglot Persistence:
 - **Relacional (Supabase/PostgreSQL):** Almacenamiento restringido para la autenticación en formato de tabla plana, soportando UUIDs relacionales como principal Foreign Key hacia otra infraestructura de datos.
 - **NoSQL (MongoDB Atlas):** Gestión de catálogos comerciales (Productores, Productos Embebidos y Comentarios anidados) que exigen flexibilidad mutacional de documentos complejos en tiempos récord.
 
+### 🌟 E. Calidad de Software: Desarrollo Guiado por Pruebas (TDD)
+En contraposición a la validación exclusivamente manual, la construcción del núcleo del sistema se respaldó mediante técnicas TDD implementadas vía **Jest** y **Supertest**.
+- **Impacto Académico:** Permite verificar la integridad de las reglas críticas del negocio (inyecciones de SQL, formatos inválidos, choque de roles) en milisegundos y evitar regresiones antes de cada despliegue, asegurando que el código sea de nivel de producción corporativo.
+
 ---
 
 ## 3. Modelo de Autorización (RBAC y JWT Local)
@@ -83,7 +87,7 @@ Para montar esta estructura localmente o auditar la aplicación:
    Una vez levantado el servidor, la documentación interactiva Swagger reemplaza la necesidad de usar Postman. 
    Para hacer pruebas manuales directas, simplemente abrí un navegador y entrá a la ruta `/api-docs`:
    - URL Local: `http://localhost:3000/api-docs`
-   - URL Remota (Vercel): `https://<tu-url-de-vercel>.vercel.app/api-docs`
+   - URL Remota (Vercel): `https://tp-utn-backend.vercel.app/api-docs`
 
 ---
 *Fin Documento Versión V1.0*
