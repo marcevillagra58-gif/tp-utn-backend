@@ -17,6 +17,7 @@ Se ha implementado una arquitectura basada en **Modelo-Vista-Controlador (MVC)**
 2. **Controladores (Controllers):** Gestionan el procesamiento de datos y casos de uso.
 3. **Modelos (Models):** Representan el esquema y mapeo de datos de la base de datos.
 4. **Middlewares:** Encapsulan lógicas protectoras transversales (Políticas RLS en el código, control de tokens JWT).
+5. **Inyección Directa de Entorno:** Se optó por una filosofía moderna de consumo nativo del objeto `process.env` in-situ (sin intermediarios centralizados como `config.js`). Esto reduce el código "boilerplate" redundante y facilita la asimilación inmediata (Zero-Config) con entornos Serverless nativos como Vercel, en donde las variables se inyectan a demanda en tiempo de ejecución.
 
 ---
 
