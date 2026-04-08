@@ -15,9 +15,22 @@ import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { typeDefs } from "../src/graphql/typeDefs.js";
 import { resolvers } from "../src/graphql/resolvers.js";
+import { JWT_SECRET, FRONTEND_URL } from "../src/config/config.js";
 import cors from "cors";
 import bodyParser from "body-parser";
 import jwt from "jsonwebtoken";
+
+const allowedOrigins = [
+  FRONTEND_URL,
+  "http://localhost:5173",
+  "http://localhost:4173",
+  "https://tp-utn-frontend.vercel.app",
+].filter(Boolean);
+
+const corsOptions = {
+  origin: allowedOrigins,
+  credentials: true,
+};
 
 // Variable de control: solo inicializamos las conexiones una vez
 // (las funciones serverless pueden "reutilizarse" entre requests)
@@ -33,7 +46,7 @@ const init = async () => {
 
     app.use(
       "/graphql",
-      cors(),
+      cors(corsOptions),
       bodyParser.json(),
       expressMiddleware(apolloServer, {
         context: async ({ req }) => {
@@ -41,7 +54,7 @@ const init = async () => {
           if (authHeader.startsWith("Bearer ")) {
             try {
               const token = authHeader.split(" ")[1];
-              const decoded = jwt.verify(token, process.env.JWT_SECRET);
+              const decoded = jwt.verify(token, JWT_SECRET);
               return { user: decoded };
             } catch {
               return { user: null };
