@@ -17,7 +17,7 @@ Se ha implementado una arquitectura basada en **Modelo-Vista-Controlador (MVC)**
 2. **Controladores (Controllers):** Gestionan el procesamiento de datos y casos de uso.
 3. **Modelos (Models):** Representan el esquema y mapeo de datos de la base de datos.
 4. **Middlewares:** Encapsulan lógicas protectoras transversales (Políticas RLS en el código, control de tokens JWT).
-5. **Inyección Directa de Entorno:** Se optó por una filosofía moderna de consumo nativo del objeto `process.env` in-situ (sin intermediarios centralizados como `config.js`). Esto reduce el código "boilerplate" redundante y facilita la asimilación inmediata (Zero-Config) con entornos Serverless nativos como Vercel, en donde las variables se inyectan a demanda en tiempo de ejecución.
+5. **Controladores como Capa de Servicio Integrada:** En lugar de agregar una carpeta `services/` separada, los controladores adoptan el patrón *Fat Controller Responsable*: encapsulan la lógica de negocio junto con el acceso a datos (Mongoose/Supabase). Esta decisión fue tomada conscientemente ya que el uso de dos ORMs heterogéneos (Mongoose + Supabase Client) hace que una capa de servicios genérica agregue complejidad sin valor adicional. En proyectos con un único motor de persistencia se aplicaría `services/` según el patrón de la cátedra.
 
 ---
 
@@ -91,4 +91,55 @@ Para montar esta estructura localmente o auditar la aplicación:
    - URL Remota (Vercel): `https://tp-utn-backend.vercel.app/api-docs`
 
 ---
-*Fin Documento Versión V1.0*
+
+## 5. Ejemplos de Solicitudes HTTP (Mock JSON)
+
+### POST `/api/auth/login` — Iniciar sesión
+```json
+{
+  "email": "admin@hurlingham.com",
+  "password": "Admin1234"
+}
+```
+
+### POST `/api/users` — Registrar nuevo usuario
+```json
+{
+  "username": "nuevo_productor",
+  "email": "productor@ejemplo.com",
+  "password": "Segura1234",
+  "role": "producer"
+}
+```
+
+### POST `/api/producers` — Crear productor *(requiere Bearer Token de Admin)*
+```json
+{
+  "name": "Panadería San Martín",
+  "description": "Panadería artesanal con más de 30 años en el barrio.",
+  "category": "gastronomia",
+  "location": "Av. Vergara 1234, Hurlingham",
+  "phone": "4665-1234",
+  "email": "panaderia@ejemplo.com"
+}
+```
+
+### POST `/api/producers/:id/products` — Agregar producto *(requiere Bearer Token)*
+```json
+{
+  "name": "Pan Casero 1kg",
+  "description": "Pan de masa madre, horneado diariamente.",
+  "price": 1200
+}
+```
+
+### POST `/api/categorias` — Crear categoría *(requiere Bearer Token de Admin)*
+```json
+{
+  "nombre": "gastronomia",
+  "icono": "🍕"
+}
+```
+
+---
+*Fin Documento Versión V2.0*
