@@ -2,6 +2,9 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
+import { PORT, FRONTEND_URL, JWT_SECRET, NODE_ENV } from "./src/config/config.js";
+
+dotenv.config();
 import http from "http";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
@@ -31,13 +34,13 @@ dotenv.config();
 
 const app = express();
 const httpServer = http.createServer(app);
-const PORT = process.env.PORT || 3000;
+const PORT_VAL = PORT;
 
 // ============================================================
 // SOCKET.IO SETUP
 // ============================================================
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
+  FRONTEND_URL,
   "http://localhost:5173",
   "http://localhost:4173", // Vite preview
   "https://tp-utn-frontend.vercel.app", // Frontend en Vercel
@@ -211,7 +214,7 @@ const startServer = async () => {
           if (authHeader.startsWith("Bearer ")) {
             const token = authHeader.split(" ")[1];
             try {
-              const decoded = jwt.verify(token, process.env.JWT_SECRET);
+              const decoded = jwt.verify(token, JWT_SECRET);
               return { user: decoded };
             } catch (err) {
               return { user: null };
@@ -228,10 +231,10 @@ const startServer = async () => {
     });
 
     // 5. Iniciar servidor HTTP
-    httpServer.listen(PORT, () => {
-      console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-      console.log(`📊 GraphQL endpoint: http://localhost:${PORT}/graphql`);
-      console.log(`📋 Health check: http://localhost:${PORT}/api/health`);
+    httpServer.listen(PORT_VAL, () => {
+      console.log(`🚀 Servidor corriendo en http://localhost:${PORT_VAL}`);
+      console.log(`📊 GraphQL endpoint: http://localhost:${PORT_VAL}/graphql`);
+      console.log(`📋 Health check: http://localhost:${PORT_VAL}/api/health`);
     });
   } catch (error) {
     console.error("❌ Error al iniciar el servidor:", error);
@@ -241,7 +244,7 @@ const startServer = async () => {
 
 // En Vercel (serverless), la inicialización la maneja api/index.js.
 // Solo arrancamos el servidor "clásico" cuando corremos localmente.
-if (process.env.NODE_ENV !== "test" && !process.env.VERCEL) {
+if (NODE_ENV !== "test" && !process.env.VERCEL) {
   startServer();
 }
 

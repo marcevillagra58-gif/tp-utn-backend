@@ -194,6 +194,7 @@ El servidor queda disponible en `http://localhost:3000`.
 | POST | `/api/producers` | 🔒 Admin | Crear productor |
 | PUT | `/api/producers/:id` | 🔒 Auth | Actualizar productor (admin o dueño) |
 | DELETE | `/api/producers/:id` | 🔒 Admin | Eliminar productor |
+| GET | `/api/producers/:id/products` | ❌ Público | Obtener catálogo de productos de un productor |
 | POST | `/api/producers/:id/products` | 🔒 Auth | Agregar producto al productor |
 | DELETE | `/api/producers/:id/products/:productId` | 🔒 Auth | Quitar producto |
 | POST | `/api/producers/:id/comments` | ⚡ Opcional | Dejar un comentario (anónimo o autenticado) |

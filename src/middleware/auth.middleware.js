@@ -12,6 +12,7 @@
  */
 
 import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "../config/config.js";
 
 /**
  * Verifica que el request tenga un JWT válido en el header Authorization.
@@ -27,7 +28,7 @@ export const authMiddleware = (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded; // { userId, role, email }
     next();
   } catch (error) {
@@ -67,7 +68,7 @@ export const optionalAuthMiddleware = (req, res, next) => {
 
   const token = authHeader.split(" ")[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
   } catch {
     // Token inválido o expirado → seguir como anónimo (no bloquear)

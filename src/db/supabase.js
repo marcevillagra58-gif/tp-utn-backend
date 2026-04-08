@@ -11,12 +11,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+import { SUPABASE_URL, SUPABASE_KEY } from "../config/config.js";
 
 if (!supabaseUrl || !supabaseKey) {
   console.error(
@@ -25,6 +20,6 @@ if (!supabaseUrl || !supabaseKey) {
   process.exit(1);
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 console.log("✅ Cliente Supabase inicializado");

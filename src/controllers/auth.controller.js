@@ -17,6 +17,7 @@ import { supabase } from "../db/supabase.js";
 import { ResetToken } from "../models/resetToken.model.js";
 import { sendPasswordResetEmail } from "../services/mailer.js";
 import { hashPassword, verifyPassword, isLegacyHash } from "../utils/passwordUtils.js";
+import { JWT_SECRET, JWT_REFRESH_SECRET, FRONTEND_URL } from "../config/config.js";
 
 const JWT_EXPIRES_IN = "8h";
 const REFRESH_EXPIRES_IN = "7d";
@@ -34,12 +35,12 @@ const generateTokens = (user) => {
     username: user.username,
   };
 
-  const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
+  const accessToken = jwt.sign(payload, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN,
   });
   const refreshToken = jwt.sign(
     { userId: user.id },
-    process.env.JWT_REFRESH_SECRET,
+    JWT_REFRESH_SECRET,
     { expiresIn: REFRESH_EXPIRES_IN },
   );
 
@@ -142,7 +143,7 @@ export const refreshToken = async (req, res) => {
     // Verificar firma del refresh token
     let decoded;
     try {
-      decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+      decoded = jwt.verify(token, JWT_REFRESH_SECRET);
     } catch {
       return res
         .status(401)
@@ -178,7 +179,7 @@ export const refreshToken = async (req, res) => {
     // Generar nuevo access token (el refresh token se reutiliza)
     const accessToken = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN },
     );
 
@@ -241,7 +242,7 @@ export const forgotPassword = async (req, res) => {
 
       // 5. Construir link de reset y enviar email (siempre al desarrollador)
       const frontendUrl =
-        process.env.FRONTEND_URL ||
+        FRONTEND_URL ||
         "http://localhost:5173/HURLINGHAM_PNO_REACT";
       const resetLink = `${frontendUrl}/#/reset-password?token=${token}`;
       await sendPasswordResetEmail(email, resetLink);

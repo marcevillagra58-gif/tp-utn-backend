@@ -10,8 +10,9 @@
  */
 
 import { Resend } from "resend";
+import { RESEND_API_KEY, DEVELOPER_EMAIL } from "../config/config.js";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(RESEND_API_KEY);
 
 /**
  * Envía el email de recuperación de contraseña.
@@ -19,7 +20,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
  * @param {string} resetLink  - Link con token para resetear la clave
  */
 export const sendPasswordResetEmail = async (userEmail, resetLink) => {
-  const developerEmail = process.env.DEVELOPER_EMAIL;
+  const developerEmail = DEVELOPER_EMAIL;
 
   const { data, error } = await resend.emails.send({
     from: "Hurlingham PNO <onboarding@resend.dev>",
