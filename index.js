@@ -40,7 +40,7 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   "http://localhost:5173",
   "http://localhost:4173", // Vite preview
-  "https://marcelo-ag.github.io", // Ejemplo de URL de GitHub Pages
+  "https://tp-utn-frontend.vercel.app", // Frontend en Vercel
 ].filter(Boolean);
 
 // Socket.io requiere conexiones persistentes (WebSocket).
