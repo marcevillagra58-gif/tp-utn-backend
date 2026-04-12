@@ -20,15 +20,24 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import jwt from "jsonwebtoken";
 
-const allowedOrigins = [
-  FRONTEND_URL,
-  "http://localhost:5173",
-  "http://localhost:4173",
-  "https://tp-utn-frontend.vercel.app",
-].filter(Boolean);
+const isOriginAllowed = (origin) => {
+  if (!origin) return true;
+  const allowed = [
+    FRONTEND_URL,
+    "http://localhost:5173",
+    "http://localhost:4173",
+    "https://tp-utn-frontend.vercel.app",
+  ].filter(Boolean);
+  if (allowed.includes(origin)) return true;
+  if (/^https:\/\/tp-utn-frontend.*\.vercel\.app$/.test(origin)) return true;
+  return false;
+};
 
 const corsOptions = {
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    if (isOriginAllowed(origin)) callback(null, true);
+    else callback(new Error(`CORS bloqueado para el origen: ${origin}`));
+  },
   credentials: true,
 };
 

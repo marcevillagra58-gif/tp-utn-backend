@@ -39,12 +39,21 @@ const PORT_VAL = PORT;
 // ============================================================
 // SOCKET.IO SETUP
 // ============================================================
-const allowedOrigins = [
-  FRONTEND_URL,
-  "http://localhost:5173",
-  "http://localhost:4173", // Vite preview
-  "https://tp-utn-frontend.vercel.app", // Frontend en Vercel
-].filter(Boolean);
+// Acepta la URL canónica, localhost y cualquier preview URL de Vercel
+// (Vercel genera URLs únicas por cada deploy: tp-utn-frontend-xxxx.vercel.app)
+const isOriginAllowed = (origin) => {
+  if (!origin) return true; // Postman / curl sin origin
+  const allowed = [
+    FRONTEND_URL,
+    "http://localhost:5173",
+    "http://localhost:4173",
+    "https://tp-utn-frontend.vercel.app",
+  ].filter(Boolean);
+  if (allowed.includes(origin)) return true;
+  // Permite cualquier preview deployment de Vercel del proyecto frontend
+  if (/^https:\/\/tp-utn-frontend.*\.vercel\.app$/.test(origin)) return true;
+  return false;
+};
 
 // Socket.io requiere conexiones persistentes (WebSocket).
 // En entornos serverless (Vercel) esto no es compatible.
@@ -105,7 +114,10 @@ app.use(
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      if (isOriginAllowed(origin)) callback(null, true);
+      else callback(new Error(`CORS bloqueado para el origen: ${origin}`));
+    },
     credentials: true,
   }),
 );
