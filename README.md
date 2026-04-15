@@ -17,7 +17,7 @@ Se ha implementado una arquitectura basada en **Modelo-Vista-Controlador (MVC)**
 2. **Controladores (Controllers):** Gestionan el procesamiento de datos y casos de uso.
 3. **Modelos (Models):** Representan el esquema y mapeo de datos de la base de datos.
 4. **Middlewares:** Encapsulan lógicas protectoras transversales (Políticas RLS en el código, control de tokens JWT).
-5. **Controladores como Capa de Servicio Integrada:** En lugar de agregar una carpeta `services/` separada, los controladores adoptan el patrón *Fat Controller Responsable*: encapsulan la lógica de negocio junto con el acceso a datos (Mongoose/Supabase). Esta decisión fue tomada conscientemente ya que el uso de dos ORMs heterogéneos (Mongoose + Supabase Client) hace que una capa de servicios genérica agregue complejidad sin valor adicional. En proyectos con un único motor de persistencia se aplicaría `services/` según el patrón de la cátedra.
+5. **Controladores como Capa de Servicio Integrada:** En lugar de agregar una carpeta `services/` separada, los controladores adoptan el patrón *Fat Controller Responsable*: encapsulan la lógica de negocio junto con el acceso a datos (Mongoose/Supabase). Esta decisión fue tomada conscientemente ya que el uso de dos ORMs heterogéneos (Mongoose + Supabase Client) hace que una capa de servicios genérica agregue complejidad sin valor adicional.
 
 ---
 
@@ -26,39 +26,25 @@ Se ha implementado una arquitectura basada en **Modelo-Vista-Controlador (MVC)**
 Para superar ampliamente los requerimientos básicos del Trabajo Práctico e incorporar estándares de mercado reales, el proyecto incluye los siguientes avances técnicos excepcionales:
 
 ### 🌟 A. Documentación Auto-Generada y Embebida (Swagger UI)
-Se descartó la entrega de documentación estática (Postman JSON Collections) en favor de una implementación nativa de **Swagger (OpenAPI V3)**.
-- **Ventaja Académica:** Expone un panel visual montado directamente sobre el Backend (`/api-docs`). 
-- Todas las rutas informan estrictamente **todos los posibles códigos de respuesta HTTP** (`200, 201, 400, 401, 403, 404, 500`), asegurando un contrato de software (Contract-First) inquebrantable para los consumidores de la API.
+Se descartó la entrega de documentación estática (Postman JSON Collections) en favor de una implementación nativa de **Swagger (OpenAPI V3)**. Expone un panel visual montado directamente sobre el Backend (`/api-docs`).
 
 ### 🌟 B. Criptografía Híbrida y Migración Dinámica de Claves
-Uno de los logros arquitectónicos de este Backend es su sistema de hashing dual y migración en caliente (Hot Migration) para contraseñas.
-- **Implementación:** El servidor diferencia e identifica si un hash de usuario heredado desde Supabase posee un formato antiguo (Hash Legacy de 60 caracteres) o si fue mejorado (Hash Estricto de 120 caracteres).
-- **Mecanismo:** Si un usuario accede con una clave antigua, el sistema valida la identidad y, tras bambalinas de manera completamente transparente (sin exigir intervención manual), re-hashea la contraseña fortalecida y actualiza la bóveda. Esto consolida una política de seguridad *Zero-Trust* y demuestra un manejo criptográfico a nivel empresarial.
+El sistema usa un esquema de hashing dual y migración transparente. Identifica si un hash es de formato antiguo (60 chars) o fortalecido (120 chars) y actualiza la bóveda automáticamente tras un login exitoso.
 
-### 🌟 C. Integración de Servicios Externos y APIs Complementarias
-Se extendió el modelo cerrado puramente CRUD consumiendo pasarelas de terceros para nutrir de datos externos la aplicación:
-1. **Cloudinary API:** Sistema robusto alojado en la nube dedicado puramente a la recepción, procesado asíncrono y almacenamiento duradero de recursos binarios mediante flujos (Streams) FormData/Multipart, reemplazando el guardado inseguro de base64 en la base de datos.
-2. **Integraciones REST Exteriores:** El backend actúa como *Proxy Transparente* e interceptor ante APIs externas como Meteorología (Open-Meteo), Noticias y sistemas gubernamentales (si aplica), resolviendo cuellos de botella de CORS.
+### 🌟 C. Integración de Servicios Externos
+1. **Cloudinary API:** Sistema de almacenamiento de recursos binarios mediante flujos (Streams), reemplazando el guardado de base64.
+2. **Integraciones REST Exteriores:** El backend actúa como Proxy Transparente ante APIs de terceros (Meteorología, Noticias).
 
-### 🌟 D. Bases de Datos Diferenciadas (Persistencia Cursada)
-Uso de un entorno Polyglot Persistence:
-- **Relacional (Supabase/PostgreSQL):** Almacenamiento restringido para la autenticación en formato de tabla plana, soportando UUIDs relacionales como principal Foreign Key hacia otra infraestructura de datos.
-- **NoSQL (MongoDB Atlas):** Gestión de catálogos comerciales (Productores, Productos Embebidos y Comentarios anidados) que exigen flexibilidad mutacional de documentos complejos en tiempos récord.
-
-### 🌟 E. Calidad de Software: Desarrollo Guiado por Pruebas (TDD)
-En contraposición a la validación exclusivamente manual, la construcción del núcleo del sistema se respaldó mediante técnicas TDD implementadas vía **Jest** y **Supertest**.
-- **Impacto Académico:** Permite verificar la integridad de las reglas críticas del negocio (inyecciones de SQL, formatos inválidos, choque de roles) en milisegundos y evitar regresiones antes de cada despliegue, asegurando que el código sea de nivel de producción corporativo.
+### 🌟 D. Bases de Datos Diferenciadas (Persistencia Políglota)
+- **Relacional (Supabase/PostgreSQL):** Almacenamiento para la autenticación y roles.
+- **NoSQL (MongoDB Atlas):** Gestión de catálogos comerciales con documentos complejos.
 
 ---
 
 ## 3. Modelo de Autorización (RBAC y JWT Local)
 
 El modelo asume estricta **Seguridad de Nivel de Fila Lógico (Logical Row Level Security)** evaluando Identificadores Únicos Universales (UUID).
-Se erradicó el rol básico de "User", enfocando el modelo a dos roles clave: **Admin** y **Producer**.
-1. **Producer:** Sólo tiene derechos sobre entidades (productos y perfil) donde la condición sea `auth.userId === entity.ownerId`.
-2. **Admin:** Bypass universal habilitado mediante *middlewares* especializados (`adminMiddleware`).
-
-Por encima, la gestión de Tokens no descansa únicamente en la solución preempaquetada de Supabase, sino que construye y asienta `Access Tokens` (Caducidad 8 horas) y `Refresh Tokens` manuales alojados asincrónicamente por el Backend.
+Se definen dos roles clave: **Admin** y **Producer**. La gestión de Tokens asienta `Access Tokens` (8 horas) y `Refresh Tokens` manuales alojados por el Backend.
 
 ---
 
@@ -72,29 +58,27 @@ Para montar esta estructura localmente o auditar la aplicación:
    ```
 
 2. **Entorno `.env`**
-   Se debe garantizar que las cadenas de conexión (URI) hacia *MongoDB* y *Supabase* están activas, junto a sus secretos criptográficos estáticos (`JWT_SECRET`).
+   Garantizar que las cadenas de conexión (URI) hacia *MongoDB* y *Supabase* están activas, junto a sus secretos criptográficos. Basarse en `.env.example`.
 
-3. **Ejecución y Modos de Testeo (TDD)**
-   Para auditar el código se incluye la suite de testing automatizada desarrollada con **Jest** y **Supertest**:
+3. **Ejecución y Tests (TDD)**
    ```bash
    # Ejecutar los tests unitarios y de integración
    npm test
 
-   # Levantar el servidor en entorno local para uso manual
+   # Levantar el servidor en entorno local
    npm run dev
    ```
 
-4. **Acceder a Swagger UI (Despliegue Local o Remoto)**
-   Una vez levantado el servidor, la documentación interactiva Swagger reemplaza la necesidad de usar Postman. 
-   Para hacer pruebas manuales directas, simplemente abrí un navegador y entrá a la ruta `/api-docs`:
+4. **Acceder a Swagger UI**
+   Para realizar pruebas manuales directas, abrir un navegador y entrar a la ruta `/api-docs`:
    - URL Local: `http://localhost:3000/api-docs`
    - URL Remota (Vercel): `https://tp-utn-backend.vercel.app/api-docs`
 
 ---
 
-## 5. Ejemplos de Solicitudes HTTP (Mock JSON)
+## 5. Ejemplos de Solicitudes HTTP
 
-### POST `/api/auth/login` — Iniciar sesión
+### POST `/api/auth/login`
 ```json
 {
   "email": "admin@hurlingham.com",
@@ -102,7 +86,7 @@ Para montar esta estructura localmente o auditar la aplicación:
 }
 ```
 
-### POST `/api/users` — Registrar nuevo usuario
+### POST `/api/users` (Registro)
 ```json
 {
   "username": "nuevo_productor",
@@ -112,34 +96,5 @@ Para montar esta estructura localmente o auditar la aplicación:
 }
 ```
 
-### POST `/api/producers` — Crear productor *(requiere Bearer Token de Admin)*
-```json
-{
-  "name": "Panadería San Martín",
-  "description": "Panadería artesanal con más de 30 años en el barrio.",
-  "category": "gastronomia",
-  "location": "Av. Vergara 1234, Hurlingham",
-  "phone": "4665-1234",
-  "email": "panaderia@ejemplo.com"
-}
-```
-
-### POST `/api/producers/:id/products` — Agregar producto *(requiere Bearer Token)*
-```json
-{
-  "name": "Pan Casero 1kg",
-  "description": "Pan de masa madre, horneado diariamente.",
-  "price": 1200
-}
-```
-
-### POST `/api/categorias` — Crear categoría *(requiere Bearer Token de Admin)*
-```json
-{
-  "nombre": "gastronomia",
-  "icono": "🍕"
-}
-```
-
 ---
-*Fin Documento Versión V2.0*
+*Fin Documento Versión V2.1*
