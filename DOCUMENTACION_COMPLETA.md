@@ -33,10 +33,11 @@ El sistema está diseñado como una **API REST + GraphQL** con autenticación JW
 
 | Tecnología | Versión | Rol |
 |---|---|---|
-| Node.js | v22 | Runtime |
-| Express | ^5 | Framework HTTP |
+| Node.js | v20 (LTS) | Runtime |
+| Express | ^4.19 | Framework HTTP |
 | Apollo Server | ^4 | Servidor GraphQL |
-| Socket.IO | ^4 | WebSockets en tiempo real |
+| Socket.IO | ^4 | WebSockets (Entorno Local) |
+| Server-Sent Events | Nativo | Notificaciones (Entorno Serverless) |
 | Mongoose | ^8 | ORM para MongoDB |
 | Supabase JS | ^2 | Cliente para PostgreSQL |
 | JWT (jsonwebtoken) | ^9 | Tokens de autenticación |
@@ -108,7 +109,7 @@ npm install
 
 ### Variables de entorno
 
-Copiá el archivo de ejemplo y completá con tus credenciales:
+Copiar el archivo de ejemplo y completar con las credenciales correspondientes:
 
 ```bash
 cp .env.example .env
@@ -284,7 +285,7 @@ Content-Type: application/json
 }
 ```
 
-Copiá el valor de `accessToken` y guardalo como variable `TOKEN` en Postman.
+Copiar el valor de `accessToken` y almacenarlo como variable `TOKEN` en Postman.
 
 ### Paso 3 — Autorizar las peticiones protegidas
 
@@ -295,19 +296,7 @@ O podés agregarlo en el header manualmente:
 Authorization: Bearer eyJhbGciOiJ...
 ```
 
-### Paso 4 — Probar el registro de un nuevo usuario
-
-```
-POST {{BASE_URL}}/api/users
-Content-Type: application/json
-
-{
-  "username": "nuevo_usuario",
-  "email": "nuevo@test.com",
-  "password": "Segura1234"
-}
-```
-> ⚠️ Si querés crear un usuario con rol `producer`, incluí también `"role": "producer"` y `"category": "servicios"` y enviá la petición **con el Bearer Token de admin**.
+> ℹ️ **Nota sobre Roles:** La creación de usuarios con rol `producer` requiere privilegios de Administrador. Para estos casos, se debe incluir el campo `"role": "producer"` en el cuerpo de la petición y enviar el `Bearer Token` de un administrador en la cabecera.
 
 ### Paso 5 — Listar productores con filtros
 
