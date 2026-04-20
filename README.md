@@ -69,10 +69,10 @@ Para montar esta estructura localmente o auditar la aplicación:
    npm run dev
    ```
 
-4. **Acceder a Swagger UI**
-   Para realizar pruebas manuales directas, abrir un navegador y entrar a la ruta `/api-docs`:
-   - URL Local: `http://localhost:3000/api-docs`
-   - URL Remota (Vercel): `https://tp-utn-backend.vercel.app/api-docs`
+4. **Acceder a Swagger UI (Explorador de API)**
+   Para evitar el uso de archivos estáticos de Postman, la API cuenta con una interfaz interactiva Swagger para explorar y probar todos los endpoints.
+   > 🌐 **URL Remota (Vercel):** [https://tp-utn-backend.vercel.app/api-docs](https://tp-utn-backend.vercel.app/api-docs)
+   > 💻 **URL Local:** `http://localhost:3000/api-docs`
 
 ---
 
@@ -150,4 +150,11 @@ A continuación se presentan los objetos JSON necesarios para interactuar con lo
 ```
 
 ---
-*Fin Documento Versión V2.3*
+
+## 📚 Documentación Extendida
+
+> 💡 **¿Buscando más detalles técnicos?**
+> Te invitamos a leer el archivo [`DOCUMENTACION_COMPLETA.md`](./DOCUMENTACION_COMPLETA.md) incluido en este repositorio. En él encontrarás una descripción mucho más profunda sobre las decisiones arquitectónicas, estrategias de migración de contraseñas híbridas, políticas de seguridad completas y el manejo exhaustivo de CORS dinámico para Vercel.
+
+---
+*Fin Documento Versión V2.4*
