@@ -1,4 +1,4 @@
-# 🚀 Gestión Integral – Hurlingham PNO Hub Backend
+# Gestión Integral – Hurlingham PNO Hub Backend
 
 **Documentación Académica Técnica y Arquitectónica**  
 *Desarrollado para la Cátedra de Programación Backend - TP Final*
@@ -33,7 +33,7 @@ El sistema usa un esquema de hashing dual y migración transparente. Identifica 
 
 ### 🌟 C. Integración de Servicios Externos
 1. **Cloudinary API:** Sistema de almacenamiento de recursos binarios mediante flujos (Streams), reemplazando el guardado de base64.
-2. **Integraciones REST Exteriores:** El backend actúa como Proxy Transparente ante APIs de terceros (Meteorología, Noticias).
+2. **Integraciones REST Exteriores:** El backend actúa como Proxy Transparente ante APIs de terceros (Meteorología).
 
 ### 🌟 D. Bases de Datos Diferenciadas (Persistencia Políglota)
 - **Relacional (Supabase/PostgreSQL):** Almacenamiento para la autenticación y roles.
@@ -76,9 +76,11 @@ Para montar esta estructura localmente o auditar la aplicación:
 
 ---
 
-## 5. Ejemplos de Solicitudes HTTP
+## 5. Ejemplos de Solicitudes (JSON Mocks)
 
-### POST `/api/auth/login`
+A continuación se presentan los objetos JSON necesarios para interactuar con los endpoints principales. Estos ejemplos pueden ser copiados directamente a Postman para realizar pruebas.
+
+### 5.1 Autenticación (POST `/api/auth/login`)
 ```json
 {
   "email": "admin@hurlingham.com",
@@ -86,15 +88,66 @@ Para montar esta estructura localmente o auditar la aplicación:
 }
 ```
 
-### POST `/api/users` (Registro)
+### 5.2 Registro de Usuarios (POST `/api/users`)
+**Usuario con rol estándar:**
 ```json
 {
-  "username": "nuevo_productor",
-  "email": "productor@ejemplo.com",
-  "password": "Segura1234",
+  "username": "vecino_hurlingham",
+  "email": "vecino@test.com",
+  "password": "Password123"
+}
+```
+
+**Nuevo Productor (Requiere Token de Admin):**
+```json
+{
+  "username": "panaderia_central",
+  "email": "panaderia@test.com",
+  "password": "Password123",
   "role": "producer"
 }
 ```
 
+### 5.3 Gestión de Productores (POST `/api/producers`)
+**Creación de perfil comercial (Requiere Token de Admin):**
+```json
+{
+  "name": "Panadería San Martín",
+  "description": "Elaboración artesanal de panificados y facturas.",
+  "category": "gastronomia",
+  "location": "Av. Vergara 1234, Hurlingham",
+  "phone": "4665-1234",
+  "email": "panaderia@ejemplo.com"
+}
+```
+
+### 5.4 Gestión de Productos (POST `/api/producers/:id/products`)
+**Agregar producto al catálogo (Requiere Token de Dueño o Admin):**
+```json
+{
+  "name": "Pan Casero 1kg",
+  "description": "Pan de masa madre, horneado en horno de barro.",
+  "imageUrl": "https://res.cloudinary.com/tu-cloud/image/upload/v123/productos/pan.jpg"
+}
+```
+
+### 5.5 Gestión de Categorías (POST `/api/categorias`)
+**Crear nueva categoría (Requiere Token de Admin):**
+```json
+{
+  "nombre": "servicios",
+  "icono": "🛠️"
+}
+```
+
+### 5.6 Subida de Imágenes (POST `/api/upload/image`)
+**Respuesta exitosa de la API (vínculo con Cloudinary):**
+```json
+{
+  "url": "https://res.cloudinary.com/tu-cloud/image/upload/v123/productos/pan.jpg",
+  "publicId": "productos/pan_abc123"
+}
+```
+
 ---
-*Fin Documento Versión V2.1*
+*Fin Documento Versión V2.3*
