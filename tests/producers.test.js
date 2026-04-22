@@ -44,27 +44,37 @@ beforeAll(async () => {
   }
 
   // 3. Setear MONGODB_URI en entorno ANTES de importar el app
-  process.env.MONGODB_URI         = uri;
-  process.env.JWT_SECRET          = "test_super_secret_key_123456";
-  process.env.JWT_REFRESH_SECRET  = "test_refresh_super_secret_key_123456";
+  process.env.MONGODB_URI = uri;
 
   // 4. Conectar mongoose al servidor en memoria
   await mongoose.connect(uri);
 
   // 5. Importar el app dinámicamente (usa la conexión ya establecida)
-  const appModule    = await import("../index.js");
+  const appModule = await import("../index.js");
   const supabaseModule = await import("../src/db/supabase.js");
-  app      = appModule.default;
+  app = appModule.default;
   supabase = supabaseModule.supabase;
 
   // 6. Stub de supabase (auth endpoints lo usan para refresh tokens)
   supabase.from = () => ({
-    select:  function() { return this; },
-    eq:      function() { return this; },
-    update:  function() { return this; },
-    single:  async function() { return { data: null, error: null }; },
-    insert:  async function() { return { data: [], error: null }; },
-    delete:  function() { return this; },
+    select: function () {
+      return this;
+    },
+    eq: function () {
+      return this;
+    },
+    update: function () {
+      return this;
+    },
+    single: async function () {
+      return { data: null, error: null };
+    },
+    insert: async function () {
+      return { data: [], error: null };
+    },
+    delete: function () {
+      return this;
+    },
   });
 });
 
@@ -93,7 +103,12 @@ const sampleProducerData = {
 // ── Helper: tokens ───────────────────────────────────────────────────────
 const adminToken = () =>
   jwt.sign(
-    { userId: "uuid-admin-test", email: "admin@test.com", role: "admin", username: "admin" },
+    {
+      userId: "uuid-admin-test",
+      email: "admin@test.com",
+      role: "admin",
+      username: "admin",
+    },
     process.env.JWT_SECRET,
     { expiresIn: "1h" },
   );
@@ -112,10 +127,8 @@ const createTestProducer = async (data = {}) => {
 };
 
 describe("Producers Controller — Tests de integración con MongoMemoryServer", () => {
-
   // ── GET /api/producers ───────────────────────────────────────────────
   describe("GET /api/producers", () => {
-
     it("debe devolver 200 con array vacío cuando no hay productores", async () => {
       const res = await supertest(app).get("/api/producers");
       expect(res.status).toBe(200);
@@ -133,10 +146,15 @@ describe("Producers Controller — Tests de integración con MongoMemoryServer",
     });
 
     it("debe filtrar por categoría con ?category=", async () => {
-      await createTestProducer({ name: "Remis Sol",   category: "transporte" });
-      await createTestProducer({ name: "Pan Artesanal", category: "panadería" });
+      await createTestProducer({ name: "Remis Sol", category: "transporte" });
+      await createTestProducer({
+        name: "Pan Artesanal",
+        category: "panadería",
+      });
 
-      const res = await supertest(app).get("/api/producers?category=transporte");
+      const res = await supertest(app).get(
+        "/api/producers?category=transporte",
+      );
       expect(res.status).toBe(200);
       expect(res.body).toHaveLength(1);
       expect(res.body[0].name).toBe("Remis Sol");
@@ -157,12 +175,10 @@ describe("Producers Controller — Tests de integración con MongoMemoryServer",
       expect(res.status).toBe(200);
       expect(res.body[0]).not.toHaveProperty("imagePublicId");
     });
-
   });
 
   // ── GET /api/producers/:id ───────────────────────────────────────────
   describe("GET /api/producers/:id", () => {
-
     it("debe devolver 200 con el productor por _id de Mongo", async () => {
       const p = await createTestProducer();
       const res = await supertest(app).get(`/api/producers/${p._id}`);
@@ -188,12 +204,10 @@ describe("Producers Controller — Tests de integración con MongoMemoryServer",
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty("userId", uuid);
     });
-
   });
 
   // ── POST /api/producers ──────────────────────────────────────────────
   describe("POST /api/producers", () => {
-
     it("debe devolver 401 si no hay token", async () => {
       const res = await supertest(app)
         .post("/api/producers")
@@ -219,12 +233,10 @@ describe("Producers Controller — Tests de integración con MongoMemoryServer",
       expect(res.body).toHaveProperty("name", "Remisería El Sol");
       expect(res.body).toHaveProperty("_id");
     });
-
   });
 
   // ── PUT /api/producers/:id ───────────────────────────────────────────
   describe("PUT /api/producers/:id", () => {
-
     it("debe devolver 404 si el productor no existe", async () => {
       const fakeId = new mongoose.Types.ObjectId();
       const res = await supertest(app)
@@ -249,7 +261,7 @@ describe("Producers Controller — Tests de integración con MongoMemoryServer",
       const p = await createTestProducer({ userId: "uuid-otro-user" });
       const res = await supertest(app)
         .put(`/api/producers/${p._id}`)
-        .set("Authorization", `Bearer ${userToken("uuid-diferente")}`)  // userId distinto
+        .set("Authorization", `Bearer ${userToken("uuid-diferente")}`) // userId distinto
         .send({ name: "Hack" });
 
       expect(res.status).toBe(403);
@@ -265,12 +277,10 @@ describe("Producers Controller — Tests de integración con MongoMemoryServer",
 
       expect(res.status).toBe(200);
     });
-
   });
 
   // ── DELETE /api/producers/:id ────────────────────────────────────────
   describe("DELETE /api/producers/:id", () => {
-
     it("debe devolver 404 si el productor no existe", async () => {
       const fakeId = new mongoose.Types.ObjectId();
       const res = await supertest(app)
@@ -286,14 +296,15 @@ describe("Producers Controller — Tests de integración con MongoMemoryServer",
         .set("Authorization", `Bearer ${adminToken()}`);
 
       expect(res.status).toBe(200);
-      expect(res.body).toHaveProperty("message", "Productor eliminado correctamente");
+      expect(res.body).toHaveProperty(
+        "message",
+        "Productor eliminado correctamente",
+      );
     });
-
   });
 
   // ── POST /api/producers/:id/comments ────────────────────────────────
   describe("POST /api/producers/:id/comments", () => {
-
     it("debe devolver 400 si el texto está vacío", async () => {
       const p = await createTestProducer();
       const res = await supertest(app)
@@ -354,12 +365,10 @@ describe("Producers Controller — Tests de integración con MongoMemoryServer",
 
       expect(res.status).toBe(404);
     });
-
   });
 
   // ── DELETE /api/producers/:id/comments/:commentId ───────────────────
   describe("DELETE /api/producers/:id/comments/:commentId", () => {
-
     it("debe devolver 404 si el productor no existe", async () => {
       const fakeId = new mongoose.Types.ObjectId();
       const res = await supertest(app)
@@ -375,7 +384,15 @@ describe("Producers Controller — Tests de integración con MongoMemoryServer",
       const { Producer } = await import("../src/models/producer.model.js");
       const updated = await Producer.findByIdAndUpdate(
         p._id,
-        { $push: { comments: { userId: "some-user", username: "Alguien", text: "Test" } } },
+        {
+          $push: {
+            comments: {
+              userId: "some-user",
+              username: "Alguien",
+              text: "Test",
+            },
+          },
+        },
         { new: true },
       );
       const commentId = updated.comments[0]._id;
@@ -393,18 +410,24 @@ describe("Producers Controller — Tests de integración con MongoMemoryServer",
       const { Producer } = await import("../src/models/producer.model.js");
       const updated = await Producer.findByIdAndUpdate(
         p._id,
-        { $push: { comments: { userId: "uuid-otro-user", username: "Otro", text: "Comentario ajeno" } } },
+        {
+          $push: {
+            comments: {
+              userId: "uuid-otro-user",
+              username: "Otro",
+              text: "Comentario ajeno",
+            },
+          },
+        },
         { new: true },
       );
       const commentId = updated.comments[0]._id;
 
       const res = await supertest(app)
         .delete(`/api/producers/${p._id}/comments/${commentId}`)
-        .set("Authorization", `Bearer ${userToken("uuid-distinto")}` );
+        .set("Authorization", `Bearer ${userToken("uuid-distinto")}`);
 
       expect(res.status).toBe(403);
     });
-
   });
-
 });

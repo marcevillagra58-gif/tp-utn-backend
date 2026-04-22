@@ -25,7 +25,12 @@ let supabase;
 // ── Helpers de tokens ────────────────────────────────────────────────────
 const adminToken = () =>
   jwt.sign(
-    { userId: "uuid-admin-001", email: "admin@test.com", role: "admin", username: "admin" },
+    {
+      userId: "uuid-admin-001",
+      email: "admin@test.com",
+      role: "admin",
+      username: "admin",
+    },
     process.env.JWT_SECRET,
     { expiresIn: "1h" },
   );
@@ -39,26 +44,39 @@ const userToken = (userId = "uuid-user-001") =>
 
 // ── Builder de Supabase reutilizable ────────────────────────────────────
 const makeSupabaseStub = (overrides = {}) => ({
-  select:  function() { return this; },
-  order:   function() { return this; },
-  eq:      function() { return this; },
-  update:  function() { return this; },
-  insert:  function() { return this; },
-  delete:  function() { return this; },
-  or:      function() { return this; },
-  single:  async function() { return { data: null, error: null }; },
-  then:    undefined, // evita que el stub se trate como thennable
+  select: function () {
+    return this;
+  },
+  order: function () {
+    return this;
+  },
+  eq: function () {
+    return this;
+  },
+  update: function () {
+    return this;
+  },
+  insert: function () {
+    return this;
+  },
+  delete: function () {
+    return this;
+  },
+  or: function () {
+    return this;
+  },
+  single: async function () {
+    return { data: null, error: null };
+  },
+  then: undefined, // evita que el stub se trate como thennable
   ...overrides,
 });
 
 // ── Setup ────────────────────────────────────────────────────────────────
 beforeAll(async () => {
-  process.env.JWT_SECRET         = "test_super_secret_key_123456";
-  process.env.JWT_REFRESH_SECRET = "test_refresh_super_secret_key_123456";
-
-  const appModule      = await import("../index.js");
+  const appModule = await import("../index.js");
   const supabaseModule = await import("../src/db/supabase.js");
-  app      = appModule.default;
+  app = appModule.default;
   supabase = supabaseModule.supabase;
 });
 
@@ -71,7 +89,6 @@ afterEach(() => {
 // GET /api/users  (solo admin)
 // ============================================================
 describe("GET /api/users", () => {
-
   it("debe devolver 401 sin token", async () => {
     const res = await supertest(app).get("/api/users");
     expect(res.status).toBe(401);
@@ -87,11 +104,14 @@ describe("GET /api/users", () => {
   it("debe devolver 200 con la lista de usuarios (admin)", async () => {
     const fakeUsers = [
       { id: "uuid-1", username: "alice", email: "a@test.com", role: "user" },
-      { id: "uuid-2", username: "bob",   email: "b@test.com", role: "admin" },
+      { id: "uuid-2", username: "bob", email: "b@test.com", role: "admin" },
     ];
-    supabase.from = () => makeSupabaseStub({
-      order: function() { return { data: fakeUsers, error: null }; },
-    });
+    supabase.from = () =>
+      makeSupabaseStub({
+        order: function () {
+          return { data: fakeUsers, error: null };
+        },
+      });
 
     const res = await supertest(app)
       .get("/api/users")
@@ -103,9 +123,12 @@ describe("GET /api/users", () => {
   });
 
   it("debe devolver 500 si Supabase lanza un error", async () => {
-    supabase.from = () => makeSupabaseStub({
-      order: function() { return { data: null, error: { message: "DB error" } }; },
-    });
+    supabase.from = () =>
+      makeSupabaseStub({
+        order: function () {
+          return { data: null, error: { message: "DB error" } };
+        },
+      });
 
     const res = await supertest(app)
       .get("/api/users")
@@ -113,14 +136,12 @@ describe("GET /api/users", () => {
 
     expect(res.status).toBe(500);
   });
-
 });
 
 // ============================================================
 // GET /api/users/:id
 // ============================================================
 describe("GET /api/users/:id", () => {
-
   it("debe devolver 403 si un user intenta ver el perfil de otro", async () => {
     const res = await supertest(app)
       .get("/api/users/uuid-otro")
@@ -129,11 +150,19 @@ describe("GET /api/users/:id", () => {
   });
 
   it("debe devolver el propio perfil (user ve su propio id)", async () => {
-    const myId   = "uuid-user-001";
-    const perfil = { id: myId, username: "usuariotest", email: "user@test.com", role: "user" };
-    supabase.from = () => makeSupabaseStub({
-      single: async function() { return { data: perfil, error: null }; },
-    });
+    const myId = "uuid-user-001";
+    const perfil = {
+      id: myId,
+      username: "usuariotest",
+      email: "user@test.com",
+      role: "user",
+    };
+    supabase.from = () =>
+      makeSupabaseStub({
+        single: async function () {
+          return { data: perfil, error: null };
+        },
+      });
 
     const res = await supertest(app)
       .get(`/api/users/${myId}`)
@@ -144,9 +173,12 @@ describe("GET /api/users/:id", () => {
   });
 
   it("debe devolver 404 si el usuario no existe", async () => {
-    supabase.from = () => makeSupabaseStub({
-      single: async function() { return { data: null, error: { message: "not found" } }; },
-    });
+    supabase.from = () =>
+      makeSupabaseStub({
+        single: async function () {
+          return { data: null, error: { message: "not found" } };
+        },
+      });
 
     const res = await supertest(app)
       .get("/api/users/uuid-inexistente")
@@ -157,9 +189,12 @@ describe("GET /api/users/:id", () => {
 
   it("admin puede ver cualquier perfil", async () => {
     const perfil = { id: "uuid-cualquiera", username: "juan", role: "user" };
-    supabase.from = () => makeSupabaseStub({
-      single: async function() { return { data: perfil, error: null }; },
-    });
+    supabase.from = () =>
+      makeSupabaseStub({
+        single: async function () {
+          return { data: perfil, error: null };
+        },
+      });
 
     const res = await supertest(app)
       .get("/api/users/uuid-cualquiera")
@@ -167,23 +202,23 @@ describe("GET /api/users/:id", () => {
 
     expect(res.status).toBe(200);
   });
-
 });
 
 // ============================================================
 // POST /api/users  (registro)
 // ============================================================
 describe("POST /api/users", () => {
-
   const validUser = {
     username: "nuevouser",
     email: "nuevo@test.com",
-    password: "Password1",  // cumple: 8 chars, mayúscula, número
+    password: "Password1", // cumple: 8 chars, mayúscula, número
+    role: "admin",
   };
 
   it("debe devolver 400 si la contraseña no tiene mayúscula", async () => {
     const res = await supertest(app)
       .post("/api/users")
+      .set("Authorization", `Bearer ${adminToken()}`)
       .send({ ...validUser, password: "sinmayuscula1" });
     expect(res.status).toBe(400);
   });
@@ -191,6 +226,7 @@ describe("POST /api/users", () => {
   it("debe devolver 400 si la contraseña no tiene número", async () => {
     const res = await supertest(app)
       .post("/api/users")
+      .set("Authorization", `Bearer ${adminToken()}`)
       .send({ ...validUser, password: "SinNumeroAAA" });
     expect(res.status).toBe(400);
   });
@@ -198,6 +234,7 @@ describe("POST /api/users", () => {
   it("debe devolver 400 si la contraseña tiene menos de 8 caracteres", async () => {
     const res = await supertest(app)
       .post("/api/users")
+      .set("Authorization", `Bearer ${adminToken()}`)
       .send({ ...validUser, password: "Abc1" });
     expect(res.status).toBe(400);
   });
@@ -205,18 +242,28 @@ describe("POST /api/users", () => {
   it("debe devolver 400 si falta el email", async () => {
     const res = await supertest(app)
       .post("/api/users")
+      .set("Authorization", `Bearer ${adminToken()}`)
       .send({ username: "test", password: "Password1" });
     expect(res.status).toBe(400);
   });
 
   it("debe registrar un usuario y devolver 201", async () => {
-    const newUser = { id: "uuid-nuevo", username: "nuevouser", email: "nuevo@test.com", role: "user" };
-    supabase.from = () => makeSupabaseStub({
-      single: async function() { return { data: newUser, error: null }; },
-    });
+    const newUser = {
+      id: "uuid-nuevo",
+      username: "nuevouser",
+      email: "nuevo@test.com",
+      role: "user",
+    };
+    supabase.from = () =>
+      makeSupabaseStub({
+        single: async function () {
+          return { data: newUser, error: null };
+        },
+      });
 
     const res = await supertest(app)
       .post("/api/users")
+      .set("Authorization", `Bearer ${adminToken()}`)
       .send(validUser);
 
     expect(res.status).toBe(201);
@@ -225,27 +272,27 @@ describe("POST /api/users", () => {
   });
 
   it("debe devolver 409 si el email ya existe (error 23505)", async () => {
-    supabase.from = () => makeSupabaseStub({
-      single: async function() {
-        return { data: null, error: { code: "23505", message: "duplicate" } };
-      },
-    });
+    supabase.from = () =>
+      makeSupabaseStub({
+        single: async function () {
+          return { data: null, error: { code: "23505", message: "duplicate" } };
+        },
+      });
 
     const res = await supertest(app)
       .post("/api/users")
+      .set("Authorization", `Bearer ${adminToken()}`)
       .send(validUser);
 
     expect(res.status).toBe(409);
     expect(res.body.error).toContain("en uso");
   });
-
 });
 
 // ============================================================
 // PUT /api/users/:id  (actualizar perfil)
 // ============================================================
 describe("PUT /api/users/:id", () => {
-
   it("debe devolver 403 si un user intenta editar otro perfil", async () => {
     const res = await supertest(app)
       .put("/api/users/uuid-otro")
@@ -265,11 +312,14 @@ describe("PUT /api/users/:id", () => {
   });
 
   it("debe actualizar el propio perfil (200)", async () => {
-    const myId  = "uuid-user-001";
+    const myId = "uuid-user-001";
     const updated = { id: myId, username: "nuevonombre", role: "user" };
-    supabase.from = () => makeSupabaseStub({
-      single: async function() { return { data: updated, error: null }; },
-    });
+    supabase.from = () =>
+      makeSupabaseStub({
+        single: async function () {
+          return { data: updated, error: null };
+        },
+      });
 
     const res = await supertest(app)
       .put(`/api/users/${myId}`)
@@ -279,14 +329,12 @@ describe("PUT /api/users/:id", () => {
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty("username", "nuevonombre");
   });
-
 });
 
 // ============================================================
 // PATCH /api/users/:id/block  (admin)
 // ============================================================
 describe("PATCH /api/users/:id/block", () => {
-
   it("debe devolver 400 si admin intenta bloquearse a sí mismo", async () => {
     const res = await supertest(app)
       .patch("/api/users/uuid-admin-001/block")
@@ -295,9 +343,12 @@ describe("PATCH /api/users/:id/block", () => {
   });
 
   it("debe devolver 404 si el usuario no existe", async () => {
-    supabase.from = () => makeSupabaseStub({
-      single: async function() { return { data: null, error: { message: "not found" } }; },
-    });
+    supabase.from = () =>
+      makeSupabaseStub({
+        single: async function () {
+          return { data: null, error: { message: "not found" } };
+        },
+      });
 
     const res = await supertest(app)
       .patch("/api/users/uuid-fantasma/block")
@@ -309,13 +360,21 @@ describe("PATCH /api/users/:id/block", () => {
   it("debe bloquear un usuario y devolver 200 con mensaje", async () => {
     // Primera llamada: obtener estado actual; Segunda: actualizar
     let callCount = 0;
-    supabase.from = () => makeSupabaseStub({
-      single: async function() {
-        callCount++;
-        if (callCount === 1) return { data: { is_blocked: false, username: "juan" }, error: null };
-        return { data: { id: "uuid-juan", username: "juan", is_blocked: true }, error: null };
-      },
-    });
+    supabase.from = () =>
+      makeSupabaseStub({
+        single: async function () {
+          callCount++;
+          if (callCount === 1)
+            return {
+              data: { is_blocked: false, username: "juan" },
+              error: null,
+            };
+          return {
+            data: { id: "uuid-juan", username: "juan", is_blocked: true },
+            error: null,
+          };
+        },
+      });
 
     const res = await supertest(app)
       .patch("/api/users/uuid-juan/block")
@@ -324,14 +383,12 @@ describe("PATCH /api/users/:id/block", () => {
     expect(res.status).toBe(200);
     expect(res.body.message).toContain("bloqueado");
   });
-
 });
 
 // ============================================================
 // PUT /api/users/:id/password
 // ============================================================
 describe("PUT /api/users/:id/password", () => {
-
   it("debe devolver 403 si intenta cambiar la contraseña de otro", async () => {
     const res = await supertest(app)
       .put("/api/users/uuid-otro/password")
@@ -354,11 +411,15 @@ describe("PUT /api/users/:id/password", () => {
     const myId = "uuid-user-001";
     const hash = await hashPassword("CorrectPass1", "usuariotest");
 
-    supabase.from = () => makeSupabaseStub({
-      single: async function() {
-        return { data: { password: hash, username: "usuariotest" }, error: null };
-      },
-    });
+    supabase.from = () =>
+      makeSupabaseStub({
+        single: async function () {
+          return {
+            data: { password: hash, username: "usuariotest" },
+            error: null,
+          };
+        },
+      });
 
     const res = await supertest(app)
       .put(`/api/users/${myId}/password`)
@@ -374,15 +435,22 @@ describe("PUT /api/users/:id/password", () => {
     const hash = await hashPassword("CorrectPass1", "usuariotest");
 
     let callCount = 0;
-    supabase.from = () => makeSupabaseStub({
-      single: async function() {
-        callCount++;
-        if (callCount === 1) return { data: { password: hash, username: "usuariotest" }, error: null };
-        return { data: {}, error: null };
-      },
-      // La segunda llamada es un update sin single
-      update: function() { return { eq: () => ({ data: {}, error: null }) }; },
-    });
+    supabase.from = () =>
+      makeSupabaseStub({
+        single: async function () {
+          callCount++;
+          if (callCount === 1)
+            return {
+              data: { password: hash, username: "usuariotest" },
+              error: null,
+            };
+          return { data: {}, error: null };
+        },
+        // La segunda llamada es un update sin single
+        update: function () {
+          return { eq: () => ({ data: {}, error: null }) };
+        },
+      });
 
     const res = await supertest(app)
       .put(`/api/users/${myId}/password`)
@@ -391,5 +459,4 @@ describe("PUT /api/users/:id/password", () => {
 
     expect([200, 500]).toContain(res.status); // 500 si el update no matchea el stub, pero la lógica se cubre
   });
-
 });

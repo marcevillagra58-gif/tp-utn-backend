@@ -1,6 +1,7 @@
 import supertest from "supertest";
 import app from "../index.js";
 import { supabase } from "../src/db/supabase.js";
+import { Producer } from "../src/models/producer.model.js";
 import jwt from "jsonwebtoken";
 
 /**
@@ -22,40 +23,60 @@ import jwt from "jsonwebtoken";
 
 // ─── Builder base ─────────────────────────────────────────────────────────
 const catBuilder = {
-  select:  function() { return this; },
-  order:   async function() { return { data: [], error: null }; },
-  eq:      function() { return this; },
-  single:  async function() { return { data: null, error: null }; },
-  insert:  function() { return this; },
-  update:  function() { return this; },
-  delete:  async function() { return { error: null }; },
+  select: function () {
+    return this;
+  },
+  order: async function () {
+    return { data: [], error: null };
+  },
+  eq: function () {
+    return this;
+  },
+  single: async function () {
+    return { data: null, error: null };
+  },
+  insert: function () {
+    return this;
+  },
+  update: function () {
+    return this;
+  },
+  delete: async function () {
+    return { error: null };
+  },
 };
 
-beforeAll(() => {
-  process.env.JWT_SECRET         = "test_super_secret_key_123456";
-  process.env.JWT_REFRESH_SECRET = "test_refresh_super_secret_key_123456";
-});
+beforeAll(() => {});
 
 afterEach(() => {
   // Reset a los defaults tras cada test
-  catBuilder.order  = async function() { return { data: [], error: null }; };
-  catBuilder.single = async function() { return { data: null, error: null }; };
-  catBuilder.delete = async function() { return { error: null }; };
+  catBuilder.order = async function () {
+    return { data: [], error: null };
+  };
+  catBuilder.single = async function () {
+    return { data: null, error: null };
+  };
+  catBuilder.delete = async function () {
+    return { error: null };
+  };
 });
 
 /** Genera un JWT de admin para pruebas */
 const adminToken = () =>
   jwt.sign(
-    { userId: "uuid-admin-cat", email: "admin@test.com", role: "admin", username: "admin" },
+    {
+      userId: "uuid-admin-cat",
+      email: "admin@test.com",
+      role: "admin",
+      username: "admin",
+    },
     process.env.JWT_SECRET,
     { expiresIn: "1h" },
   );
 
 describe("Categories Controller — Tests de integración", () => {
-
   // ── GET /api/categorias ──────────────────────────────────────────────
   describe("GET /api/categorias", () => {
-
     it("debe devolver 200 con array vacío si no hay categorías", async () => {
       supabase.from = () => catBuilder;
 
@@ -65,11 +86,11 @@ describe("Categories Controller — Tests de integración", () => {
     });
 
     it("debe devolver 200 con la lista de categorías", async () => {
-      catBuilder.order = async function() {
+      catBuilder.order = async function () {
         return {
           data: [
-            { id: 1, nombre: "frutas",    icono: "🍎" },
-            { id: 2, nombre: "verduras",  icono: "🥦" },
+            { id: 1, nombre: "frutas", icono: "🍎" },
+            { id: 2, nombre: "verduras", icono: "🥦" },
           ],
           error: null,
         };
@@ -83,7 +104,7 @@ describe("Categories Controller — Tests de integración", () => {
     });
 
     it("debe devolver 500 si Supabase devuelve un error", async () => {
-      catBuilder.order = async function() {
+      catBuilder.order = async function () {
         return { data: null, error: { message: "DB error" } };
       };
       supabase.from = () => catBuilder;
@@ -91,12 +112,10 @@ describe("Categories Controller — Tests de integración", () => {
       const res = await supertest(app).get("/api/categorias");
       expect(res.status).toBe(500);
     });
-
   });
 
   // ── POST /api/categorias ─────────────────────────────────────────────
   describe("POST /api/categorias", () => {
-
     it("debe devolver 400 si no se envía nombre", async () => {
       supabase.from = () => catBuilder;
       const res = await supertest(app)
@@ -119,7 +138,7 @@ describe("Categories Controller — Tests de integración", () => {
     });
 
     it("debe devolver 201 con la nueva categoría creada", async () => {
-      catBuilder.single = async function() {
+      catBuilder.single = async function () {
         return {
           data: { id: 5, nombre: "lácteos", icono: "🥛" },
           error: null,
@@ -137,7 +156,7 @@ describe("Categories Controller — Tests de integración", () => {
     });
 
     it("debe devolver 409 si el nombre ya existe (unique_violation)", async () => {
-      catBuilder.single = async function() {
+      catBuilder.single = async function () {
         return {
           data: null,
           error: { code: "23505", message: "unique violation" },
@@ -153,12 +172,10 @@ describe("Categories Controller — Tests de integración", () => {
       expect(res.status).toBe(409);
       expect(res.body.error).toContain("Ya existe");
     });
-
   });
 
   // ── PUT /api/categorias/:id ──────────────────────────────────────────
   describe("PUT /api/categorias/:id", () => {
-
     it("debe devolver 400 si no se envían campos a actualizar", async () => {
       supabase.from = () => catBuilder;
       const res = await supertest(app)
@@ -171,7 +188,7 @@ describe("Categories Controller — Tests de integración", () => {
     });
 
     it("debe devolver 200 con la categoría actualizada", async () => {
-      catBuilder.single = async function() {
+      catBuilder.single = async function () {
         return {
           data: { id: 1, nombre: "frutas frescas", icono: "🍎" },
           error: null,
@@ -189,7 +206,7 @@ describe("Categories Controller — Tests de integración", () => {
     });
 
     it("debe devolver 404 si la categoría no existe", async () => {
-      catBuilder.single = async function() {
+      catBuilder.single = async function () {
         return { data: null, error: null }; // supabase devuelve null cuando no encuentra
       };
       supabase.from = () => catBuilder;
@@ -201,14 +218,12 @@ describe("Categories Controller — Tests de integración", () => {
 
       expect(res.status).toBe(404);
     });
-
   });
 
   // ── DELETE /api/categorias/:id ───────────────────────────────────────
   describe("DELETE /api/categorias/:id", () => {
-
     it("debe devolver 404 si la categoría no existe", async () => {
-      catBuilder.single = async function() {
+      catBuilder.single = async function () {
         return { data: null, error: { message: "not found" } };
       };
       // El delete usa from() dos veces: categorias + producers
@@ -222,26 +237,14 @@ describe("Categories Controller — Tests de integración", () => {
     });
 
     it("debe devolver 409 si hay productores asignados a la categoría", async () => {
-      // Primera llamada: obtener la categoría → ok
-      // Segunda llamada: contar productores → count > 0
-      let callCount = 0;
-      supabase.from = (table) => {
-        if (table === "categorias" && callCount === 0) {
-          callCount++;
-          return {
-            select:  function() { return this; },
-            eq:      function() { return this; },
-            single:  async function() { return { data: { nombre: "frutas" }, error: null }; },
-          };
-        }
-        // Segunda llamada: producers
-        return {
-          select: function() { return this; },
-          eq:     function() { return this; },
-          // simula count > 0 — el objeto devuelto por supabase tiene { count }
-          then: (resolve) => resolve({ count: 3, error: null }),
-        };
-      };
+      supabase.from = () => ({
+        select: function() { return this; },
+        eq:     function() { return this; },
+        single: async function() { return { data: { nombre: "frutas" }, error: null }; },
+      });
+
+      const originalCount = Producer.countDocuments;
+      Producer.countDocuments = async () => 3;
 
       const res = await supertest(app)
         .delete("/api/categorias/1")
@@ -249,33 +252,20 @@ describe("Categories Controller — Tests de integración", () => {
 
       expect(res.status).toBe(409);
       expect(res.body.error).toContain("No se puede eliminar");
+      
+      Producer.countDocuments = originalCount;
     });
 
     it("debe devolver 200 si la categoría se elimina correctamente", async () => {
-      let callCount = 0;
-      supabase.from = (table) => {
-        if (table === "categorias" && callCount === 0) {
-          callCount++;
-          return {
-            select:  function() { return this; },
-            eq:      function() { return this; },
-            single:  async function() { return { data: { nombre: "frutas" }, error: null }; },
-            delete:  function() { return { eq: function() { return Promise.resolve({ error: null }); } }; },
-          };
-        }
-        if (table === "producers") {
-          return {
-            select: function() { return this; },
-            eq:     function() { return this; },
-            then:   (resolve) => resolve({ count: 0, error: null }),
-          };
-        }
-        // Tercera llamada: delete
-        return {
-          delete: function() { return this; },
-          eq: async function() { return { error: null }; },
-        };
-      };
+      supabase.from = () => ({
+        select: function() { return this; },
+        eq:     function() { return this; },
+        single: async function() { return { data: { nombre: "frutas" }, error: null }; },
+        delete: function() { return { eq: async function() { return { error: null }; } }; },
+      });
+
+      const originalCount = Producer.countDocuments;
+      Producer.countDocuments = async () => 0;
 
       const res = await supertest(app)
         .delete("/api/categorias/1")
@@ -283,8 +273,8 @@ describe("Categories Controller — Tests de integración", () => {
 
       expect(res.status).toBe(200);
       expect(res.body.message).toContain("eliminada");
+
+      Producer.countDocuments = originalCount;
     });
-
   });
-
 });

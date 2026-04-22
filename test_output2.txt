@@ -1,0 +1,527 @@
+
+> hurlingham-backend@1.0.0 test
+> node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --forceExit --verbose --coverage
+
+  console.log
+    ✅ Cliente Supabase inicializado
+
+      at log (src/db/supabase.js:28:11)
+
+  console.log
+    ✅ Cloudinary configurado correctamente
+
+      at log (src/utils/cloudinary.js:72:9)
+
+  console.log
+    ✅ Socket.io inicializado
+
+      at log (index.js:83:11)
+
+(node:26068) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+  console.error
+    getCategorias error: { message: 'DB error' }
+
+    [0m [90m 27 |[39m     res[33m.[39mjson(data)[33m;[39m
+     [90m 28 |[39m   } [36mcatch[39m (err) {
+    [31m[1m>[22m[39m[90m 29 |[39m     console[33m.[39merror([32m"getCategorias error:"[39m[33m,[39m err)[33m;[39m
+     [90m    |[39m             [31m[1m^[22m[39m
+     [90m 30 |[39m     res[33m.[39mstatus([35m500[39m)[33m.[39mjson({ error[33m:[39m [32m"No se pudieron obtener las categorías"[39m })[33m;[39m
+     [90m 31 |[39m   }
+     [90m 32 |[39m }[33m;[39m[0m
+
+      at error (src/controllers/categories.controller.js:29:13)
+
+  console.error
+    deleteCategoria error: MongooseError: Operation `producers.countDocuments()` buffering timed out after 10000ms
+        at Timeout.<anonymous> (F:\UTN\BACKEND\TP FINAL\TP - FINAL - RED\Hurlingham_BACK\node_modules\mongoose\lib\drivers\node-mongodb-native\collection.js:187:23)
+        at listOnTimeout (node:internal/timers:588:17)
+        at processTimers (node:internal/timers:523:7)
+
+    [0m [90m 145 |[39m     res[33m.[39mjson({ message[33m:[39m [32m`Categoría "${cat.nombre}" eliminada correctamente`[39m })[33m;[39m
+     [90m 146 |[39m   } [36mcatch[39m (err) {
+    [31m[1m>[22m[39m[90m 147 |[39m     console[33m.[39merror([32m"deleteCategoria error:"[39m[33m,[39m err)[33m;[39m
+     [90m     |[39m             [31m[1m^[22m[39m
+     [90m 148 |[39m     res[33m.[39mstatus([35m500[39m)[33m.[39mjson({ error[33m:[39m [32m"No se pudo eliminar la categoría"[39m })[33m;[39m
+     [90m 149 |[39m   }
+     [90m 150 |[39m }[33m;[39m[0m
+
+      at error (src/controllers/categories.controller.js:147:13)
+
+  console.error
+    deleteCategoria error: MongooseError: Operation `producers.countDocuments()` buffering timed out after 10000ms
+        at Timeout.<anonymous> (F:\UTN\BACKEND\TP FINAL\TP - FINAL - RED\Hurlingham_BACK\node_modules\mongoose\lib\drivers\node-mongodb-native\collection.js:187:23)
+        at listOnTimeout (node:internal/timers:588:17)
+        at processTimers (node:internal/timers:523:7)
+
+    [0m [90m 145 |[39m     res[33m.[39mjson({ message[33m:[39m [32m`Categoría "${cat.nombre}" eliminada correctamente`[39m })[33m;[39m
+     [90m 146 |[39m   } [36mcatch[39m (err) {
+    [31m[1m>[22m[39m[90m 147 |[39m     console[33m.[39merror([32m"deleteCategoria error:"[39m[33m,[39m err)[33m;[39m
+     [90m     |[39m             [31m[1m^[22m[39m
+     [90m 148 |[39m     res[33m.[39mstatus([35m500[39m)[33m.[39mjson({ error[33m:[39m [32m"No se pudo eliminar la categoría"[39m })[33m;[39m
+     [90m 149 |[39m   }
+     [90m 150 |[39m }[33m;[39m[0m
+
+      at error (src/controllers/categories.controller.js:147:13)
+
+FAIL tests/categories.test.js (22.348 s)
+  Categories Controller — Tests de integración
+    GET /api/categorias
+      √ debe devolver 200 con array vacío si no hay categorías (100 ms)
+      √ debe devolver 200 con la lista de categorías (9 ms)
+      √ debe devolver 500 si Supabase devuelve un error (17 ms)
+    POST /api/categorias
+      √ debe devolver 400 si no se envía nombre (25 ms)
+      √ debe devolver 400 si nombre es un string vacío (13 ms)
+      √ debe devolver 201 con la nueva categoría creada (10 ms)
+      √ debe devolver 409 si el nombre ya existe (unique_violation) (9 ms)
+    PUT /api/categorias/:id
+      √ debe devolver 400 si no se envían campos a actualizar (11 ms)
+      √ debe devolver 200 con la categoría actualizada (12 ms)
+      √ debe devolver 404 si la categoría no existe (12 ms)
+    DELETE /api/categorias/:id
+      √ debe devolver 404 si la categoría no existe (11 ms)
+      × debe devolver 409 si hay productores asignados a la categoría (10026 ms)
+      × debe devolver 200 si la categoría se elimina correctamente (10022 ms)
+
+  ● Categories Controller — Tests de integración › DELETE /api/categorias/:id › debe devolver 409 si hay productores asignados a la categoría
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 409
+    Received: 500
+
+    [0m [90m 272 |[39m         [33m.[39m[36mset[39m([32m"Authorization"[39m[33m,[39m [32m`Bearer ${adminToken()}`[39m)[33m;[39m
+     [90m 273 |[39m
+    [31m[1m>[22m[39m[90m 274 |[39m       expect(res[33m.[39mstatus)[33m.[39mtoBe([35m409[39m)[33m;[39m
+     [90m     |[39m                          [31m[1m^[22m[39m
+     [90m 275 |[39m       expect(res[33m.[39mbody[33m.[39merror)[33m.[39mtoContain([32m"No se puede eliminar"[39m)[33m;[39m
+     [90m 276 |[39m     })[33m;[39m
+     [90m 277 |[39m[0m
+
+      at Object.<anonymous> (tests/categories.test.js:274:26)
+
+  ● Categories Controller — Tests de integración › DELETE /api/categorias/:id › debe devolver 200 si la categoría se elimina correctamente
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 500
+
+    [0m [90m 326 |[39m         [33m.[39m[36mset[39m([32m"Authorization"[39m[33m,[39m [32m`Bearer ${adminToken()}`[39m)[33m;[39m
+     [90m 327 |[39m
+    [31m[1m>[22m[39m[90m 328 |[39m       expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                          [31m[1m^[22m[39m
+     [90m 329 |[39m       expect(res[33m.[39mbody[33m.[39mmessage)[33m.[39mtoContain([32m"eliminada"[39m)[33m;[39m
+     [90m 330 |[39m     })[33m;[39m
+     [90m 331 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/categories.test.js:328:26)
+
+  console.log
+    ✅ Cliente Supabase inicializado
+
+      at log (src/db/supabase.js:28:11)
+
+  console.log
+    ✅ Cloudinary configurado correctamente
+
+      at log (src/utils/cloudinary.js:72:9)
+
+  console.log
+    ✅ Socket.io inicializado
+
+      at log (index.js:83:11)
+
+  console.error
+    Error en getUsers: { message: 'DB error' }
+
+    [0m [90m 61 |[39m     res[33m.[39mjson(data)[33m;[39m
+     [90m 62 |[39m   } [36mcatch[39m (err) {
+    [31m[1m>[22m[39m[90m 63 |[39m     console[33m.[39merror([32m"Error en getUsers:"[39m[33m,[39m err)[33m;[39m
+     [90m    |[39m             [31m[1m^[22m[39m
+     [90m 64 |[39m     res[33m.[39mstatus([35m500[39m)[33m.[39mjson({ error[33m:[39m [32m"Error interno del servidor"[39m })[33m;[39m
+     [90m 65 |[39m   }
+     [90m 66 |[39m }[33m;[39m[0m
+
+      at error (src/controllers/users.controller.js:63:13)
+
+FAIL tests/users.test.js
+  GET /api/users
+    √ debe devolver 401 sin token (29 ms)
+    √ debe devolver 403 si el rol es 'user' (28 ms)
+    √ debe devolver 200 con la lista de usuarios (admin) (20 ms)
+    √ debe devolver 500 si Supabase lanza un error (15 ms)
+  GET /api/users/:id
+    √ debe devolver 403 si un user intenta ver el perfil de otro (15 ms)
+    √ debe devolver el propio perfil (user ve su propio id) (11 ms)
+    √ debe devolver 404 si el usuario no existe (11 ms)
+    √ admin puede ver cualquier perfil (14 ms)
+  POST /api/users
+    × debe devolver 400 si la contraseña no tiene mayúscula (23 ms)
+    × debe devolver 400 si la contraseña no tiene número (12 ms)
+    × debe devolver 400 si la contraseña tiene menos de 8 caracteres (15 ms)
+    × debe devolver 400 si falta el email (10 ms)
+    × debe registrar un usuario y devolver 201 (10 ms)
+    × debe devolver 409 si el email ya existe (error 23505) (15 ms)
+  PUT /api/users/:id
+    √ debe devolver 403 si un user intenta editar otro perfil (16 ms)
+    √ debe devolver 400 si no se envía ningún campo a actualizar (15 ms)
+    √ debe actualizar el propio perfil (200) (13 ms)
+  PATCH /api/users/:id/block
+    √ debe devolver 400 si admin intenta bloquearse a sí mismo (11 ms)
+    √ debe devolver 404 si el usuario no existe (9 ms)
+    √ debe bloquear un usuario y devolver 200 con mensaje (9 ms)
+  PUT /api/users/:id/password
+    √ debe devolver 403 si intenta cambiar la contraseña de otro (10 ms)
+    √ debe devolver 400 si la nueva contraseña no cumple requisitos (11 ms)
+    √ debe devolver 401 si la contraseña actual es incorrecta (447 ms)
+    √ debe cambiar la contraseña exitosamente (200) (672 ms)
+
+  ● POST /api/users › debe devolver 400 si la contraseña no tiene mayúscula
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: 401
+
+    [0m [90m 219 |[39m       [33m.[39mpost([32m"/api/users"[39m)
+     [90m 220 |[39m       [33m.[39msend({ [33m...[39mvalidUser[33m,[39m password[33m:[39m [32m"sinmayuscula1"[39m })[33m;[39m
+    [31m[1m>[22m[39m[90m 221 |[39m     expect(res[33m.[39mstatus)[33m.[39mtoBe([35m400[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 222 |[39m   })[33m;[39m
+     [90m 223 |[39m
+     [90m 224 |[39m   it([32m"debe devolver 400 si la contraseña no tiene número"[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (tests/users.test.js:221:24)
+
+  ● POST /api/users › debe devolver 400 si la contraseña no tiene número
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: 401
+
+    [0m [90m 226 |[39m       [33m.[39mpost([32m"/api/users"[39m)
+     [90m 227 |[39m       [33m.[39msend({ [33m...[39mvalidUser[33m,[39m password[33m:[39m [32m"SinNumeroAAA"[39m })[33m;[39m
+    [31m[1m>[22m[39m[90m 228 |[39m     expect(res[33m.[39mstatus)[33m.[39mtoBe([35m400[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 229 |[39m   })[33m;[39m
+     [90m 230 |[39m
+     [90m 231 |[39m   it([32m"debe devolver 400 si la contraseña tiene menos de 8 caracteres"[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (tests/users.test.js:228:24)
+
+  ● POST /api/users › debe devolver 400 si la contraseña tiene menos de 8 caracteres
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: 401
+
+    [0m [90m 233 |[39m       [33m.[39mpost([32m"/api/users"[39m)
+     [90m 234 |[39m       [33m.[39msend({ [33m...[39mvalidUser[33m,[39m password[33m:[39m [32m"Abc1"[39m })[33m;[39m
+    [31m[1m>[22m[39m[90m 235 |[39m     expect(res[33m.[39mstatus)[33m.[39mtoBe([35m400[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 236 |[39m   })[33m;[39m
+     [90m 237 |[39m
+     [90m 238 |[39m   it([32m"debe devolver 400 si falta el email"[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (tests/users.test.js:235:24)
+
+  ● POST /api/users › debe devolver 400 si falta el email
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: 401
+
+    [0m [90m 240 |[39m       [33m.[39mpost([32m"/api/users"[39m)
+     [90m 241 |[39m       [33m.[39msend({ username[33m:[39m [32m"test"[39m[33m,[39m password[33m:[39m [32m"Password1"[39m })[33m;[39m
+    [31m[1m>[22m[39m[90m 242 |[39m     expect(res[33m.[39mstatus)[33m.[39mtoBe([35m400[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 243 |[39m   })[33m;[39m
+     [90m 244 |[39m
+     [90m 245 |[39m   it([32m"debe registrar un usuario y devolver 201"[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (tests/users.test.js:242:24)
+
+  ● POST /api/users › debe registrar un usuario y devolver 201
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 401
+
+    [0m [90m 259 |[39m     [36mconst[39m res [33m=[39m [36mawait[39m supertest(app)[33m.[39mpost([32m"/api/users"[39m)[33m.[39msend(validUser)[33m;[39m
+     [90m 260 |[39m
+    [31m[1m>[22m[39m[90m 261 |[39m     expect(res[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 262 |[39m     expect(res[33m.[39mbody)[33m.[39mtoHaveProperty([32m"username"[39m[33m,[39m [32m"nuevouser"[39m)[33m;[39m
+     [90m 263 |[39m     expect(res[33m.[39mbody)[33m.[39mnot[33m.[39mtoHaveProperty([32m"password"[39m)[33m;[39m [90m// la contraseña nunca se expone[39m
+     [90m 264 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/users.test.js:261:24)
+
+  ● POST /api/users › debe devolver 409 si el email ya existe (error 23505)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 409
+    Received: 401
+
+    [0m [90m 274 |[39m     [36mconst[39m res [33m=[39m [36mawait[39m supertest(app)[33m.[39mpost([32m"/api/users"[39m)[33m.[39msend(validUser)[33m;[39m
+     [90m 275 |[39m
+    [31m[1m>[22m[39m[90m 276 |[39m     expect(res[33m.[39mstatus)[33m.[39mtoBe([35m409[39m)[33m;[39m
+     [90m     |[39m                        [31m[1m^[22m[39m
+     [90m 277 |[39m     expect(res[33m.[39mbody[33m.[39merror)[33m.[39mtoContain([32m"en uso"[39m)[33m;[39m
+     [90m 278 |[39m   })[33m;[39m
+     [90m 279 |[39m })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/users.test.js:276:24)
+
+  console.log
+    ✅ Cliente Supabase inicializado
+
+      at log (src/db/supabase.js:28:11)
+
+  console.log
+    ✅ Cloudinary configurado correctamente
+
+      at log (src/utils/cloudinary.js:72:9)
+
+  console.log
+    ✅ Socket.io inicializado
+
+      at log (index.js:83:11)
+
+  console.warn
+    ⚠️ MongoDB desconectado. Intentando reconectar...
+
+    [0m [90m 34 |[39m [90m// Manejar desconexión inesperada[39m
+     [90m 35 |[39m mongoose[33m.[39mconnection[33m.[39mon([32m"disconnected"[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 36 |[39m   console[33m.[39mwarn([32m"⚠️ MongoDB desconectado. Intentando reconectar..."[39m)[33m;[39m
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m 37 |[39m })[33m;[39m
+     [90m 38 |[39m[0m
+
+      at NativeConnection.warn (src/db/mongo.js:36:11)
+      at NativeConnection.set (node_modules/mongoose/lib/connection.js:149:12)
+      at NativeConnection.onClose (node_modules/mongoose/lib/connection.js:1319:19)
+      at NativeConnection._close (node_modules/mongoose/lib/connection.js:1268:12)
+          at async Promise.all (index 0)
+      at Mongoose.disconnect (node_modules/mongoose/lib/mongoose.js:471:3)
+      at Object.<anonymous> (tests/producers.test.js:82:3)
+
+PASS tests/producers.test.js
+  Producers Controller — Tests de integración con MongoMemoryServer
+    GET /api/producers
+      √ debe devolver 200 con array vacío cuando no hay productores (79 ms)
+      √ debe devolver 200 con la lista de productores activos (48 ms)
+      √ debe filtrar por categoría con ?category= (27 ms)
+      √ debe mostrar productores inactivos con ?active=all (admin) (27 ms)
+      √ no debe exponer el campo imagePublicId (18 ms)
+    GET /api/producers/:id
+      √ debe devolver 200 con el productor por _id de Mongo (22 ms)
+      √ debe devolver 404 si el ID no existe (14 ms)
+      √ debe devolver 404 si el ID es un ObjectId inválido (14 ms)
+      √ debe buscar por userId (UUID de Supabase) (19 ms)
+    POST /api/producers
+      √ debe devolver 401 si no hay token (19 ms)
+      √ debe devolver 403 si el rol es 'user' (14 ms)
+      √ debe crear un productor y devolver 201 (admin) (24 ms)
+    PUT /api/producers/:id
+      √ debe devolver 404 si el productor no existe (22 ms)
+      √ debe actualizar el productor y devolver 200 (admin) (28 ms)
+      √ debe devolver 403 si un usuario intenta editar un productor que no es suyo (20 ms)
+      √ el dueño del perfil puede editar sin ser admin (25 ms)
+    DELETE /api/producers/:id
+      √ debe devolver 404 si el productor no existe (15 ms)
+      √ debe eliminar el productor y devolver 200 (admin) (19 ms)
+    POST /api/producers/:id/comments
+      √ debe devolver 400 si el texto está vacío (19 ms)
+      √ debe devolver 400 si el texto supera 500 caracteres (20 ms)
+      √ debe agregar comentario anónimo y devolver 201 (23 ms)
+      √ debe usar 'Visitante' si no hay nombre ni token (22 ms)
+      √ debe usar el username del JWT si el usuario está logueado (22 ms)
+      √ debe devolver 404 si el productor no existe (18 ms)
+    DELETE /api/producers/:id/comments/:commentId
+      √ debe devolver 404 si el productor no existe (15 ms)
+      √ admin puede eliminar cualquier comentario (31 ms)
+      √ debe devolver 403 si un user intenta eliminar el comentario de otro (26 ms)
+
+  console.log
+    ✅ Cliente Supabase inicializado
+
+      at log (src/db/supabase.js:28:11)
+
+  console.log
+    ✅ Cloudinary configurado correctamente
+
+      at log (src/utils/cloudinary.js:72:9)
+
+  console.log
+    ✅ Socket.io inicializado
+
+      at log (index.js:83:11)
+
+  console.warn
+    ⚠️ MongoDB desconectado. Intentando reconectar...
+
+    [0m [90m 34 |[39m [90m// Manejar desconexión inesperada[39m
+     [90m 35 |[39m mongoose[33m.[39mconnection[33m.[39mon([32m"disconnected"[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 36 |[39m   console[33m.[39mwarn([32m"⚠️ MongoDB desconectado. Intentando reconectar..."[39m)[33m;[39m
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m 37 |[39m })[33m;[39m
+     [90m 38 |[39m[0m
+
+      at NativeConnection.warn (src/db/mongo.js:36:11)
+      at NativeConnection.set (node_modules/mongoose/lib/connection.js:149:12)
+      at NativeConnection.onClose (node_modules/mongoose/lib/connection.js:1319:19)
+      at NativeConnection._close (node_modules/mongoose/lib/connection.js:1268:12)
+          at async Promise.all (index 0)
+      at Mongoose.disconnect (node_modules/mongoose/lib/mongoose.js:471:3)
+      at Object.<anonymous> (tests/contact.test.js:67:3)
+
+PASS tests/contact.test.js
+  POST /api/contact
+    √ debe devolver 400 si falta el nombre (117 ms)
+    √ debe devolver 400 si el email es inválido (22 ms)
+    √ debe devolver 400 si falta el mensaje (15 ms)
+    √ debe enviar un mensaje y devolver 201 (30 ms)
+    √ debe guardar el mensaje sin teléfono (campo opcional) (18 ms)
+  GET /api/contact
+    √ debe devolver 401 sin token (13 ms)
+    √ debe devolver 403 si el rol es 'user' (14 ms)
+    √ debe devolver 200 con array vacío si no hay mensajes (19 ms)
+    √ debe devolver todos los mensajes ordenados por fecha (admin) (28 ms)
+  PATCH /api/contact/:id/read
+    √ debe devolver 401 sin token (14 ms)
+    √ debe devolver 400 si falta el campo 'read' (19 ms)
+    √ debe marcar un mensaje como leído (26 ms)
+    √ debe marcar un mensaje como NO leído (20 ms)
+    √ debe devolver 404 si el ID no existe (18 ms)
+    √ debe devolver 404 si el ID es un ObjectId inválido (CastError) (16 ms)
+
+  console.log
+    ✅ Cliente Supabase inicializado
+
+      at log (src/db/supabase.js:28:11)
+
+  console.log
+    ✅ Cloudinary configurado correctamente
+
+      at log (src/utils/cloudinary.js:72:9)
+
+  console.log
+    ✅ Socket.io inicializado
+
+      at log (index.js:83:11)
+
+  console.log
+    🔐 LOGIN — usuario: "marcelo" | esquema: DUAL (120) | válido: true
+
+      at log (src/controllers/auth.controller.js:90:13)
+
+  console.log
+    🔐 LOGIN — usuario: "marcelo" | esquema: DUAL (120) | válido: false
+
+      at log (src/controllers/auth.controller.js:90:13)
+
+PASS tests/auth.test.js
+  Auth Controller - Integration Tests
+    POST /api/auth/login
+      √ debe retornar error 401 si las credenciales en DB no existen (usuario no encontrado) (36 ms)
+      √ debe retornar 403 si el usuario está bloqueado (11 ms)
+      √ debe hacer login exitoso (200) y devolver accessToken y refreshToken al usar credenciales válidas (450 ms)
+      √ debe retornar 401 si la contraseña es incorrecta (467 ms)
+    POST /api/auth/logout
+      √ debe devolver 200 aunque no se envíe refreshToken (12 ms)
+      √ debe devolver 200 y eliminar el refresh token de la BD (12 ms)
+    POST /api/auth/refresh
+      √ debe retornar 400 si no se envía refreshToken (13 ms)
+      √ debe retornar 401 si el refreshToken tiene firma inválida (12 ms)
+      √ debe retornar 401 si el refreshToken no existe en la BD (13 ms)
+      √ debe retornar 200 con nuevo accessToken si el refreshToken es válido (15 ms)
+
+  console.log
+    ✅ Cliente Supabase inicializado
+
+      at log (src/db/supabase.js:28:11)
+
+  console.log
+    ✅ Cloudinary configurado correctamente
+
+      at log (src/utils/cloudinary.js:72:9)
+
+  console.log
+    ✅ Socket.io inicializado
+
+      at log (index.js:83:11)
+
+PASS tests/middleware.test.js
+  Auth Middleware — Tests de integración
+    authMiddleware
+      √ debe retornar 401 si no se envía header Authorization (50 ms)
+      √ debe retornar 401 si el header no empieza con 'Bearer ' (16 ms)
+      √ debe retornar 401 si el token es una cadena inválida (22 ms)
+      √ debe retornar 401 si el token está expirado (38 ms)
+    adminMiddleware
+      √ debe retornar 403 si el token es válido pero el rol es 'user' (20 ms)
+      √ debe dejar pasar al controlador si el token es válido con rol 'admin' (15 ms)
+    optionalAuthMiddleware (GET /api/categorias es ruta pública)
+      √ debe funcionar SIN token (anónimo) (12 ms)
+      √ debe funcionar CON token válido (usuario logueado) (9 ms)
+
+---------------------------------|---------|----------|---------|---------|-----------------------------------------------------------------------------------------------
+File                             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                             
+---------------------------------|---------|----------|---------|---------|-----------------------------------------------------------------------------------------------
+All files                        |   52.81 |    43.68 |   38.63 |   54.35 |                                                                                               
+ Hurlingham_BACK                 |   42.66 |    22.22 |   14.28 |   42.25 |                                                                                               
+  index.js                       |   42.66 |    22.22 |   14.28 |   42.25 | 46-55,66-69,77-79,85-87,125,141,165-166,172-174,216-259,266                                   
+ Hurlingham_BACK/src/config      |     100 |       50 |     100 |     100 |                                                                                               
+  config.js                      |     100 |       50 |     100 |     100 | 15-17                                                                                         
+  swagger.js                     |     100 |      100 |     100 |     100 |                                                                                               
+ Hurlingham_BACK/src/controllers |   50.27 |     48.6 |   56.81 |   51.03 |                                                                                               
+  auth.controller.js             |      51 |    45.23 |   71.42 |   51.51 | 100-109,126-127,176,188-189,208-209,217-255,263-320                                           
+  categories.controller.js       |   73.68 |    70.96 |     100 |   75.47 | 58,63-64,92-97,106-107,132-145                                                                
+  contact.controller.js          |      80 |       90 |     100 |      80 | 49-50,65-66,102-103                                                                           
+  external.controller.js         |   15.78 |        0 |       0 |   16.66 | 21-47                                                                                         
+  notifications.controller.js    |   23.52 |      100 |      20 |      25 | 18-39,48                                                                                      
+  producers.controller.js        |   54.66 |    56.47 |      70 |   54.05 | 39,48-49,87-88,99,136-137,148,190,198-202,219-223,231-244,252-304,312-338,381-385,402,418-422 
+  upload.controller.js           |   11.11 |        0 |       0 |   11.11 | 23-41,50-61                                                                                   
+  users.controller.js            |    43.2 |    38.67 |   41.66 |   45.03 | 29-37,43-44,96-97,105-182,193,213,231-232,237-320,363-364,396,419-420                         
+ Hurlingham_BACK/src/db          |   47.05 |    57.14 |      50 |      50 |                                                                                               
+  mongo.js                       |   33.33 |       25 |      50 |   36.36 | 18,24-30                                                                                      
+  supabase.js                    |      80 |       70 |     100 |      80 | 17                                                                                            
+ Hurlingham_BACK/src/graphql     |    4.16 |        0 |       0 |     5.4 |                                                                                               
+  resolvers.js                   |    2.12 |        0 |       0 |    2.77 | 17-145                                                                                        
+  typeDefs.js                    |     100 |      100 |     100 |     100 |                                                                                               
+ Hurlingham_BACK/src/middleware  |   91.42 |     87.5 |      75 |   91.42 |                                                                                               
+  auth.middleware.js             |     100 |      100 |     100 |     100 |                                                                                               
+  rateLimit.middleware.js        |     100 |      100 |     100 |     100 |                                                                                               
+  upload.middleware.js           |    62.5 |        0 |       0 |    62.5 | 29-32                                                                                         
+ Hurlingham_BACK/src/models      |     100 |      100 |     100 |     100 |                                                                                               
+  contact.model.js               |     100 |      100 |     100 |     100 |                                                                                               
+  producer.model.js              |     100 |      100 |     100 |     100 |                                                                                               
+  resetToken.model.js            |     100 |      100 |     100 |     100 |                                                                                               
+ Hurlingham_BACK/src/routes      |   85.71 |        0 |       0 |   85.71 |                                                                                               
+  auth.routes.js                 |     100 |      100 |     100 |     100 |                                                                                               
+  categories.routes.js           |     100 |      100 |     100 |     100 |                                                                                               
+  contact.routes.js              |     100 |      100 |     100 |     100 |                                                                                               
+  external.routes.js             |     100 |      100 |     100 |     100 |                                                                                               
+  notifications.routes.js        |     100 |      100 |     100 |     100 |                                                                                               
+  producers.routes.js            |     100 |      100 |     100 |     100 |                                                                                               
+  upload.routes.js               |   27.27 |        0 |       0 |   27.27 | 74-86                                                                                         
+  users.routes.js                |     100 |      100 |     100 |     100 |                                                                                               
+ Hurlingham_BACK/src/services    |      20 |        0 |       0 |   22.22 |                                                                                               
+  mailer.js                      |      20 |        0 |       0 |   22.22 | 23-86                                                                                         
+ Hurlingham_BACK/src/utils       |   63.33 |    41.66 |   42.85 |   67.85 |                                                                                               
+  cloudinary.js                  |   33.33 |       40 |       0 |   38.46 | 24,43-58,68-69                                                                                
+  passwordUtils.js               |   93.33 |       50 |     100 |   93.33 | 68                                                                                            
+---------------------------------|---------|----------|---------|---------|-----------------------------------------------------------------------------------------------
+Test Suites: 2 failed, 4 passed, 6 total
+Tests:       8 failed, 89 passed, 97 total
+Snapshots:   0 total
+Time:        34.33 s
+Ran all test suites.

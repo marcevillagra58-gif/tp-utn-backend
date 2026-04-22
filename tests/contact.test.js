@@ -24,26 +24,33 @@ let mongoServer;
 // ── Helpers de tokens ────────────────────────────────────────────────────
 const adminToken = () =>
   jwt.sign(
-    { userId: "uuid-admin-001", email: "admin@test.com", role: "admin", username: "admin" },
+    {
+      userId: "uuid-admin-001",
+      email: "admin@test.com",
+      role: "admin",
+      username: "admin",
+    },
     process.env.JWT_SECRET,
     { expiresIn: "1h" },
   );
 
 const userToken = () =>
   jwt.sign(
-    { userId: "uuid-user-001", email: "user@test.com", role: "user", username: "usuario" },
+    {
+      userId: "uuid-user-001",
+      email: "user@test.com",
+      role: "user",
+      username: "usuario",
+    },
     process.env.JWT_SECRET,
     { expiresIn: "1h" },
   );
 
 // ── Setup ────────────────────────────────────────────────────────────────
 beforeAll(async () => {
-  process.env.JWT_SECRET         = "test_super_secret_key_123456";
-  process.env.JWT_REFRESH_SECRET = "test_refresh_super_secret_key_123456";
-
   // Levantar MongoDB en RAM
   mongoServer = await MongoMemoryServer.create();
-  const uri   = mongoServer.getUri();
+  const uri = mongoServer.getUri();
 
   // Desconectar si hay conexión previa (a Atlas) y reconectar al memory server
   if (mongoose.connection.readyState !== 0) {
@@ -61,7 +68,6 @@ afterAll(async () => {
   if (mongoServer) await mongoServer.stop();
 });
 
-
 afterEach(async () => {
   // Limpiar colección Contact entre tests
   const { Contact } = await import("../src/models/contact.model.js");
@@ -72,8 +78,8 @@ afterEach(async () => {
 const createTestMessage = async (data = {}) => {
   const { Contact } = await import("../src/models/contact.model.js");
   return Contact.create({
-    name:    "Juan Pérez",
-    email:   "juan@test.com",
+    name: "Juan Pérez",
+    email: "juan@test.com",
     message: "Mensaje de prueba",
     ...data,
   });
@@ -83,7 +89,6 @@ const createTestMessage = async (data = {}) => {
 // POST /api/contact
 // ============================================================
 describe("POST /api/contact", () => {
-
   it("debe devolver 400 si falta el nombre", async () => {
     const res = await supertest(app)
       .post("/api/contact")
@@ -106,14 +111,12 @@ describe("POST /api/contact", () => {
   });
 
   it("debe enviar un mensaje y devolver 201", async () => {
-    const res = await supertest(app)
-      .post("/api/contact")
-      .send({
-        name:    "María García",
-        email:   "maria@test.com",
-        phone:   "11-2222-3333",
-        message: "Quería consultar por los horarios",
-      });
+    const res = await supertest(app).post("/api/contact").send({
+      name: "María García",
+      email: "maria@test.com",
+      phone: "11-2222-3333",
+      message: "Quería consultar por los horarios",
+    });
 
     expect(res.status).toBe(201);
     expect(res.body.message).toContain("Mensaje enviado");
@@ -122,25 +125,21 @@ describe("POST /api/contact", () => {
   });
 
   it("debe guardar el mensaje sin teléfono (campo opcional)", async () => {
-    const res = await supertest(app)
-      .post("/api/contact")
-      .send({
-        name:    "Sin Telefono",
-        email:   "sin@test.com",
-        message: "Mensaje sin teléfono",
-      });
+    const res = await supertest(app).post("/api/contact").send({
+      name: "Sin Telefono",
+      email: "sin@test.com",
+      message: "Mensaje sin teléfono",
+    });
 
     expect(res.status).toBe(201);
     expect(res.body.data).toHaveProperty("name", "Sin Telefono");
   });
-
 });
 
 // ============================================================
 // GET /api/contact  (solo admin)
 // ============================================================
 describe("GET /api/contact", () => {
-
   it("debe devolver 401 sin token", async () => {
     const res = await supertest(app).get("/api/contact");
     expect(res.status).toBe(401);
@@ -164,8 +163,8 @@ describe("GET /api/contact", () => {
   });
 
   it("debe devolver todos los mensajes ordenados por fecha (admin)", async () => {
-    await createTestMessage({ name: "Primero",  email: "a@test.com" });
-    await createTestMessage({ name: "Segundo",  email: "b@test.com" });
+    await createTestMessage({ name: "Primero", email: "a@test.com" });
+    await createTestMessage({ name: "Segundo", email: "b@test.com" });
 
     const res = await supertest(app)
       .get("/api/contact")
@@ -176,14 +175,12 @@ describe("GET /api/contact", () => {
     // Los más recientes primero (sort desc)
     expect(res.body[0]).toHaveProperty("name", "Segundo");
   });
-
 });
 
 // ============================================================
 // PATCH /api/contact/:id/read  (solo admin)
 // ============================================================
 describe("PATCH /api/contact/:id/read", () => {
-
   it("debe devolver 401 sin token", async () => {
     const fakeId = new mongoose.Types.ObjectId();
     const res = await supertest(app)
@@ -217,7 +214,10 @@ describe("PATCH /api/contact/:id/read", () => {
   it("debe marcar un mensaje como NO leído", async () => {
     const { Contact } = await import("../src/models/contact.model.js");
     const msg = await Contact.create({
-      name: "Test", email: "t@t.com", message: "Hola", read: true,
+      name: "Test",
+      email: "t@t.com",
+      message: "Hola",
+      read: true,
     });
 
     const res = await supertest(app)
@@ -247,5 +247,4 @@ describe("PATCH /api/contact/:id/read", () => {
 
     expect(res.status).toBe(404);
   });
-
 });

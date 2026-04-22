@@ -20,41 +20,59 @@ import jwt from "jsonwebtoken";
  */
 
 const mockCatBuilder = {
-  select:  function() { return this; },
-  order:   async function() { return { data: [], error: null }; },
-  eq:      function() { return this; },
-  single:  async function() { return { data: { id: 1, nombre: "frutas", icono: "🍎" }, error: null }; },
-  insert:  function() { return this; },
-  update:  function() { return this; },
-  delete:  async function() { return { error: null }; },
+  select: function () {
+    return this;
+  },
+  order: async function () {
+    return { data: [], error: null };
+  },
+  eq: function () {
+    return this;
+  },
+  single: async function () {
+    return { data: { id: 1, nombre: "frutas", icono: "🍎" }, error: null };
+  },
+  insert: function () {
+    return this;
+  },
+  update: function () {
+    return this;
+  },
+  delete: async function () {
+    return { error: null };
+  },
 };
 
 beforeAll(() => {
-  process.env.JWT_SECRET          = "test_super_secret_key_123456";
-  process.env.JWT_REFRESH_SECRET  = "test_refresh_super_secret_key_123456";
   supabase.from = () => mockCatBuilder;
 });
 
 /** Genera un token JWT de prueba con el rol indicado */
 const makeToken = (role = "user", expiry = "1h") =>
   jwt.sign(
-    { userId: "uuid-test-mw", email: "test@test.com", role, username: "tester" },
+    {
+      userId: "uuid-test-mw",
+      email: "test@test.com",
+      role,
+      username: "tester",
+    },
     process.env.JWT_SECRET,
     { expiresIn: expiry },
   );
 
 describe("Auth Middleware — Tests de integración", () => {
-
   // ── authMiddleware ─────────────────────────────────────────────────────
   describe("authMiddleware", () => {
-
     it("debe retornar 401 si no se envía header Authorization", async () => {
       const res = await supertest(app)
         .post("/api/categorias")
         .send({ nombre: "Test" });
 
       expect(res.status).toBe(401);
-      expect(res.body).toHaveProperty("error", "Token de autenticación requerido");
+      expect(res.body).toHaveProperty(
+        "error",
+        "Token de autenticación requerido",
+      );
     });
 
     it("debe retornar 401 si el header no empieza con 'Bearer '", async () => {
@@ -64,7 +82,10 @@ describe("Auth Middleware — Tests de integración", () => {
         .send({ nombre: "Test" });
 
       expect(res.status).toBe(401);
-      expect(res.body).toHaveProperty("error", "Token de autenticación requerido");
+      expect(res.body).toHaveProperty(
+        "error",
+        "Token de autenticación requerido",
+      );
     });
 
     it("debe retornar 401 si el token es una cadena inválida", async () => {
@@ -89,12 +110,10 @@ describe("Auth Middleware — Tests de integración", () => {
       expect(res.status).toBe(401);
       expect(res.body.error).toContain("expirado");
     });
-
   });
 
   // ── adminMiddleware ────────────────────────────────────────────────────
   describe("adminMiddleware", () => {
-
     it("debe retornar 403 si el token es válido pero el rol es 'user'", async () => {
       const userToken = makeToken("user");
 
@@ -104,7 +123,10 @@ describe("Auth Middleware — Tests de integración", () => {
         .send({ nombre: "Test" });
 
       expect(res.status).toBe(403);
-      expect(res.body).toHaveProperty("error", "Acceso denegado. Se requiere rol admin.");
+      expect(res.body).toHaveProperty(
+        "error",
+        "Acceso denegado. Se requiere rol admin.",
+      );
     });
 
     it("debe dejar pasar al controlador si el token es válido con rol 'admin'", async () => {
@@ -114,17 +136,15 @@ describe("Auth Middleware — Tests de integración", () => {
       const res = await supertest(app)
         .post("/api/categorias")
         .set("Authorization", `Bearer ${adminToken}`)
-        .send({});  // body vacío → el controlador devuelve 400
+        .send({}); // body vacío → el controlador devuelve 400
 
       expect(res.status).toBe(400);
       expect(res.body).toHaveProperty("error", "El nombre es requerido");
     });
-
   });
 
   // ── optionalAuthMiddleware ─────────────────────────────────────────────
   describe("optionalAuthMiddleware (GET /api/categorias es ruta pública)", () => {
-
     it("debe funcionar SIN token (anónimo)", async () => {
       const res = await supertest(app).get("/api/categorias");
       expect(res.status).toBe(200);
@@ -138,7 +158,5 @@ describe("Auth Middleware — Tests de integración", () => {
         .set("Authorization", `Bearer ${userToken}`);
       expect(res.status).toBe(200);
     });
-
   });
-
 });
