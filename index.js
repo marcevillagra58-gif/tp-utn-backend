@@ -2,7 +2,12 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
-import { PORT, FRONTEND_URL, JWT_SECRET, NODE_ENV } from "./src/config/config.js";
+import {
+  PORT,
+  FRONTEND_URL,
+  JWT_SECRET,
+  NODE_ENV,
+} from "./src/config/config.js";
 
 dotenv.config();
 import http from "http";
@@ -50,8 +55,9 @@ const isOriginAllowed = (origin) => {
     "https://tp-utn-frontend.vercel.app",
   ].filter(Boolean);
   if (allowed.includes(origin)) return true;
-  // Permite cualquier preview deployment de Vercel del proyecto frontend
-  if (/^https:\/\/tp-utn-frontend.*\.vercel\.app$/.test(origin)) return true;
+  // Permite cualquier preview deployment de Vercel del proyecto frontend o backend
+  if (/^https:\/\/tp-utn-(frontend|backend).*\.vercel\.app$/.test(origin))
+    return true;
   return false;
 };
 
@@ -82,7 +88,10 @@ try {
 
   console.log("✅ Socket.io inicializado");
 } catch (err) {
-  console.warn("⚠️  Socket.io no disponible en este entorno (serverless):", err.message);
+  console.warn(
+    "⚠️  Socket.io no disponible en este entorno (serverless):",
+    err.message,
+  );
   // Stub vacío para que io.emit() no rompa el resto del código
   io = { emit: () => {}, on: () => {} };
 }
@@ -111,11 +120,17 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
         styleSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
-        imgSrc: ["'self'", "data:", "https://unpkg.com", "https://res.cloudinary.com", "https://validator.swagger.io"],
+        imgSrc: [
+          "'self'",
+          "data:",
+          "https://unpkg.com",
+          "https://res.cloudinary.com",
+          "https://validator.swagger.io",
+        ],
         connectSrc: ["'self'", "https://unpkg.com"],
       },
     },
-  })
+  }),
 );
 
 app.use(
@@ -242,6 +257,17 @@ const startServer = async () => {
         },
       }),
     );
+
+    // Middleware global de manejo de errores (CORS u otros throw a next)
+    app.use((err, req, res, next) => {
+      console.error("🔴 Error atrapado por middleware global:", err.message);
+      if (err.message && err.message.startsWith("CORS bloqueado")) {
+        return res.status(403).json({ error: err.message });
+      }
+      res
+        .status(500)
+        .json({ error: "Internal Server Error", details: err.message });
+    });
 
     // 4. Ruta 404 (solo para lo que no atraparon REST o GraphQL)
     app.use((req, res) => {
