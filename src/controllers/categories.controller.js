@@ -11,6 +11,7 @@
  */
 
 import { supabase } from "../db/supabase.js";
+import { Producer } from "../models/producer.model.js";
 
 // ─────────────────────────────────────────────
 // GET /api/categorias — Público
@@ -50,7 +51,9 @@ export const createCategoria = async (req, res) => {
     if (error) {
       // Código 23505 = unique_violation en PostgreSQL
       if (error.code === "23505") {
-        return res.status(409).json({ error: "Ya existe una categoría con ese nombre" });
+        return res
+          .status(409)
+          .json({ error: "Ya existe una categoría con ese nombre" });
       }
       throw error;
     }
@@ -72,7 +75,7 @@ export const updateCategoria = async (req, res) => {
 
     const updates = {};
     if (nombre) updates.nombre = nombre.trim().toLowerCase();
-    if (icono)  updates.icono  = icono.trim();
+    if (icono) updates.icono = icono.trim();
 
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ error: "Nada que actualizar" });
@@ -87,7 +90,9 @@ export const updateCategoria = async (req, res) => {
 
     if (error) {
       if (error.code === "23505") {
-        return res.status(409).json({ error: "Ya existe una categoría con ese nombre" });
+        return res
+          .status(409)
+          .json({ error: "Ya existe una categoría con ese nombre" });
       }
       throw error;
     }
@@ -121,13 +126,8 @@ export const deleteCategoria = async (req, res) => {
       return res.status(404).json({ error: "Categoría no encontrada" });
     }
 
-    // Verificar si hay productores usando esta categoría
-    const { count, error: countErr } = await supabase
-      .from("producers")
-      .select("id", { count: "exact", head: true })
-      .eq("category", cat.nombre);
-
-    if (countErr) throw countErr;
+    // Verificar si hay productores usando esta categoría (MongoDB)
+    const count = await Producer.countDocuments({ category: cat.nombre });
 
     if (count > 0) {
       return res.status(409).json({

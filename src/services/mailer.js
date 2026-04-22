@@ -22,6 +22,14 @@ const resend = new Resend(RESEND_API_KEY);
 export const sendPasswordResetEmail = async (userEmail, resetLink) => {
   const developerEmail = DEVELOPER_EMAIL;
 
+  // Guard: si no hay credenciales de email configuradas, no fallar con 500
+  if (!RESEND_API_KEY || !developerEmail) {
+    console.warn(
+      "⚠️  mailer: RESEND_API_KEY o DEVELOPER_EMAIL no configurados — email no enviado.",
+    );
+    return null;
+  }
+
   const { data, error } = await resend.emails.send({
     from: "Hurlingham PNO <onboarding@resend.dev>",
     to: [developerEmail], // ← SIEMPRE va al mail real del desarrollador
