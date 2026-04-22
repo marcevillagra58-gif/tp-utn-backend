@@ -2,7 +2,7 @@
  * ============================================================================
  * ROUTES/CONTACT.ROUTES.JS — Rutas para el formulario de contacto
  * ============================================================================
- * 
+ *
  * @swagger
  * tags:
  *   name: Contact / Messages
@@ -46,16 +46,31 @@ const contactValidation = [
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - message
  *             properties:
  *               name:
  *                 type: string
+ *                 example: "Juan Pérez"
  *               email:
  *                 type: string
+ *                 format: email
+ *                 example: "juan@ejemplo.com"
+ *               phone:
+ *                 type: string
+ *                 example: "11-1234-5678"
  *               message:
  *                 type: string
+ *                 example: "Quiero obtener más información sobre los servicios disponibles."
  *     responses:
  *       201:
  *         description: Mensaje enviado exitosamente.
+ *       400:
+ *         description: Datos de entrada inválidos (validación fallida).
+ *       500:
+ *         description: Error interno del servidor.
  */
 router.post("/", contactValidation, sendContactMessage);
 
