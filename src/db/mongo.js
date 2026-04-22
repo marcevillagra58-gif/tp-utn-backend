@@ -15,12 +15,14 @@ import mongoose from "mongoose";
 import { MONGODB_URI } from "../config/config.js";
 
 if (!MONGODB_URI) {
-  console.error("❌ Error: MONGODB_URI no está definida en .env");
-  process.exit(1);
+  console.warn(
+    "⚠️ Advertencia: MONGODB_URI no está definida en .env. La conexión a MongoDB fallará.",
+  );
 }
 
 export const connectMongoDB = async () => {
   try {
+    if (!MONGODB_URI) throw new Error("MONGODB_URI no definida");
     await mongoose.connect(MONGODB_URI);
     console.log("✅ MongoDB Atlas conectado correctamente");
   } catch (error) {

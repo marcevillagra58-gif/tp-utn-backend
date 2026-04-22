@@ -14,12 +14,16 @@ import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_KEY } from "../config/config.js";
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
-  console.error(
-    "❌ Error: SUPABASE_URL o SUPABASE_KEY no están definidas en .env",
+  console.warn(
+    "⚠️ Advertencia: SUPABASE_URL o SUPABASE_KEY no están definidas en .env. Supabase no funcionará.",
   );
-  process.exit(1);
 }
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+export const supabase =
+  SUPABASE_URL && SUPABASE_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_KEY)
+    : null;
 
-console.log("✅ Cliente Supabase inicializado");
+if (supabase) {
+  console.log("✅ Cliente Supabase inicializado");
+}
