@@ -160,6 +160,17 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+app.get("/api/health-env", (req, res) => {
+  res.json({
+    SUPABASE_URL: !!process.env.SUPABASE_URL,
+    SUPABASE_KEY: !!process.env.SUPABASE_KEY,
+    RESEND_API_KEY: !!process.env.RESEND_API_KEY,
+    DEVELOPER_EMAIL: process.env.DEVELOPER_EMAIL || "NOT_SET",
+    MONGODB_URI: !!process.env.MONGODB_URI,
+    FRONTEND_URL: process.env.FRONTEND_URL || "NOT_SET"
+  });
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/producers", producerRoutes);
